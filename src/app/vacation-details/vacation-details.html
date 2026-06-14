@@ -1,0 +1,220 @@
+<!-- <p>vacation-details works!</p> -->
+
+<!-- <a href="/vacation-list"><button class="backButton" type="button" onclick="alert('Back to the big list!')">Go Back</button></a><br>
+
+<h1>Vacay 1 Details:</h1>
+
+<a href="/profile"><button class="profileButton" type="button" onclick="alert('We\'ve got your identification right here!')">Profile</button></a><br><br>
+
+<button class="searchButton" type="button" onclick="alert('The Search button is still under construction. Please be patient!')">Search</button><br><br>
+
+<form>
+    <label class="label1" for="vtitle">Title: </label>
+    <input class="field1" type="text" id="vtitle" name="vtitle"><br><br>
+    <label class="label2" for="vlodging">Lodging: </label>
+    <input class="field2" type="text" id="vlodging" name="vlodging"><br><br>
+    <label class="label3" for="vstart-date">Start Date: </label>
+    <input class="field3" type="text" id="vstart-date" name="vstart-date"><br><br>
+    <label class="label4" for="vend-date">End Date: </label>
+    <input class="field4" type="text" id="vend-date" name="vend-date"><br><br>
+    <label class="label5" for="vdescription">Description: </label>
+    <input class="field5" type="textbox" id="vdescription" name="vdescription"><br><br>
+</form>
+
+<a href="/vacation-list"><button class="saveButton" type="button" onclick="alert('Let\'s put this excursion on the big list')">Save</button></a><br>
+
+<ul>
+    <li><a href="/excursion-details">Excur 1</a></li>
+    <li><a href="/excursion-details">Excur 2</a></li>
+    <li><a href="/excursion-details">Excur 3</a></li>
+    <li><a href="/excursion-details">Excur 4</a></li>
+    <li>...</li>
+</ul><br>
+
+<a href="/excursion-details"><button class="addExcurButton" type="button", onclick="alert('Let\'s make an excursion!')">Add Excursion?</button></a> -->
+
+
+<!-- New Version -->
+
+<button class="backButton" type="button" (click)="vacayListReturn()">Go Back</button><br>
+
+<h1 class="text-center">{{ vacayTitle }}</h1>
+
+<button class="profileButton" type="button" (click)="profilePath()" onclick="alert('We\'ve got your identification right here!')">Profile</button><br><br>
+
+<!-- <button class="searchButton" type="button" onclick="alert('The Search button is still under construction. Please be patient!')">Search</button><br><br> -->
+
+<button class="deleteButton" type="button" (click)="deleteVacay()">Delete Vacation?</button><br><br>
+
+<div class="container">    
+    <div class="row">
+        <div class="col-6" id='form-input'>
+            <form (ngSubmit)="onSubmit()" #f="ngForm">
+                <div id="user-data"
+                ngModelGroup="userData"
+                #userData="ngModelGroup">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input
+                        type="text"
+                        id="title"
+                        class="form-control"
+                        ngModel
+                        name="title"
+                        required
+                        text
+                        #title="ngModel"
+                        placeholder="{{this.chosenVacation.title}}">
+                        
+                        @if (!title.valid && title.touched) {
+                            <span class="help-block">Names have meaning. Give your vacation a memorable one!</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lodging">Lodging:</label>
+                        <input
+                        type="text"
+                        id="lodging"
+                        class="form-control"
+                        ngModel
+                        name="lodging"
+                        required
+                        text
+                        #lodging="ngModel"
+                        placeholder="{{this.chosenVacation.lodging}}">
+                        
+                        @if (!lodging.valid && lodging.touched) {
+                            <span class="help-block">Don't forget, you need a place to stay while on your vacay.</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input
+                        type="text"
+                        id="start_date"
+                        class="form-control"
+                        ngModel
+                        name="start_date"
+                        required
+                        text
+                        #start_date="ngModel"
+                        placeholder="{{this.chosenVacation.start_date}}">
+
+                        @if (!start_date.valid && start_date.touched) {
+                            <span class="help-block">Give yourself a time on when you are going on vacation.</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input
+                        type="text"
+                        id="end_date"
+                        class="form-control"
+                        ngModel
+                        name="end_date"
+                        required
+                        text
+                        #end_date="ngModel"
+                        placeholder="{{this.chosenVacation.end_date}}">
+
+                        @if (!end_date.valid && end_date.touched) {
+                            <span class="help-block">You gotta go back to work eventually. Best to be prepared.</span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <!-- <input
+                        type="text"
+                        id="description"
+                        class="form-control"
+                        ngModel
+                        name="description"
+                        required
+                        text
+                        #description="ngModel"> -->
+
+                        <textarea
+                        type="text"
+                        id="description"
+                        class="form-control"
+                        ngModel
+                        name="description"
+                        required
+                        text
+                        #description="ngModel"
+                        placeholder="{{this.chosenVacation.description}}"></textarea>
+
+                        @if (!description.valid && description.touched) {
+                            <span class="help-block">Summarise your vacation, so you remember what it's about.</span>
+                        }
+                    </div>
+
+                </div>
+
+                <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="!f.valid">Save</button>
+
+            </form>         
+        </div>
+
+        <!-- @if (submitted) {
+            <div class="col-6" id="displayData">
+                <h3>Your Vacation Data:</h3>
+                <p>Title: {{ vacation.title }}</p>
+                <p>Lodging: {{ vacation.lodging }}</p>
+                <p>Start Date: {{ vacation.start_date }}</p>
+                <p>End Date: {{ vacation.end_date }}</p>
+                <p>Description: {{ vacation.description }} </p>
+            </div>
+        } -->
+
+    </div>
+</div>
+
+<!-- <ul>
+    @for (excur of excursions; track $index) {
+        <li><a href="/excursion-details">{{ excur }}</a></li>
+    }
+</ul> -->
+
+<button class="addExcurButton" type="button" 
+(click)="addExcurPath()">Add Excursion?</button><br>
+
+<form (submit)="onListSubmit()" #lf="ngForm">
+    <div
+    id="user-data"
+    ngModelGroup="userData"
+    #userData="ngModelGroup">
+        <div>
+            <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Excursion Title</button>
+            <input class="searchBox" id="searchBox" type="text" name="searchBox" #searchBox [(ngModel)]="searchValue" 
+            name="searchValue" placeholder="Type your title here."/><br><br>
+        </div>
+    </div>
+</form>
+
+<div class="container">
+    <h2 class="text-center bg-success text-white">Excursions:</h2>
+    <div class="row" style="margin-top:30px;">
+        @for (excur of excursions; track $index) {
+            <div class="col-md-3, col-xs-6">
+                <a>
+                    <div class="card" (click)="excurDetailsPath(excur.id)">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ excur.title }}</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

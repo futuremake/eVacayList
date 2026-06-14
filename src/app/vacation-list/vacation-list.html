@@ -1,0 +1,79 @@
+<!-- <p>vacation-list works!</p> -->
+
+<button class="logOutButton" type="button" (click)="logOutPath()">Log-out</button><br>
+
+<h1> {{ title }} </h1>
+
+<button class="profileButton" type="button" (click)="profilePath()">Profile</button><br><br>
+
+<!-- <form (submit)="onSubmit()" #f="ngForm">
+    <div 
+    id="user-data" 
+    ngModelGroup="userData" 
+    #userData="ngModelGroup">
+        <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Vacation Title</button>
+        <input class="searchBox" type="text" id="searchBox" name="searchBox" #searchBox [(ngModel)]="searchValue" name="searchValue" placeholder="Type your title here."/><br><br>
+    </div>
+    
+</form> -->
+
+<form (submit)="onSubmit()" #f="ngForm">
+    <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Vacation Title</button>
+    <input class="searchBox" type="text" id="searchBox" name="searchBox" #searchBox [(ngModel)]="searchValue" name="searchValue" placeholder="Type your title here."/><br><br>
+    
+</form>
+
+<!-- <ul>
+    <li><a href="/vacation-details">Vacay 1</a></li>
+    <li><a href="/vacation-details">Vacay 2</a></li>
+    <li><a href="/vacation-details">Vacay 3</a></li>
+    <li><a href="/vacation-details">Vacay 4</a></li>
+    <li><a href="/vacation-details">Vacay 5</a></li>
+    <li><a href="/vacation-details">Vacay 6</a></li>
+    <li><a href="/vacation-details">Vacay 7</a></li>
+    <li><a href="/vacation-details">Vacay 8</a></li>
+    <li>...</li>
+</ul><br> -->
+
+<!-- <ul>
+    @for (item of vacationListItems; track $index) {
+        <li><a href="/vacation-details">{{ item }}</a></li>
+    }
+</ul><br> -->
+
+<button class="addVacayButton" type="button" 
+(click)="addVacayPath()">Add Vacation?</button><br>
+
+
+<div class="container">
+    <h2 class="text-center bg-success text-white">Vacations:</h2>
+    <div class="row" style="margin-top:30px;">
+        <!-- @for (vacay of vacations; track $index) {
+            <div class="col-md-3, col-xs-6">
+                <a href="/vacation-details">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ vacay.title }}</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        } -->
+
+        <!-- New Version -->
+
+        @for (vacay of vacations; track $index) {
+            <div class="col-md-3, col-xs-6">
+                <a (click)="vacayDetailsPath(vacay.id)">
+                    <div class="card">
+                        <div class="card-body" >
+                            <h3 class="card-title">{{ vacay.title }}</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+
+
+    </div>
+</div>

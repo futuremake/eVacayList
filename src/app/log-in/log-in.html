@@ -1,0 +1,117 @@
+<!-- <p>log-in works!</p> -->
+
+<!-- <a href="/home"><button class="backButton" type="button" onclick="alert('Going back home!')">Go Back</button></a><br>
+
+<h1>The Bouncer Screen</h1>
+
+<a href="/how-to"><button class="helpButton" type="button", onclick="alert('Want some help? We know where to go!')">Help Page</button></a><br>
+
+<p>Please log in to start building your custom-made list!</p>
+
+
+<form>
+    <label class="label1" for="uname">Username: </label>
+    <input class="field1" type="text" id="uname" name="uname"><br><br>
+    <label class="label2" for="pword">Password: </label>
+    <input class="field2" type="text" id="pword" name="pword"><br><br>
+</form>
+
+<a href="/new-account" class="link1">No Account? Click here to make one!</a><br><br>
+
+<a href="/new-password" class="link2">Forgot your password? Click here to get a new one!</a><br><br>
+
+<a href="/vacation-list"><button class="enterButton" type="button" onclick="alert('To the list-building site!')">Enter</button></a> -->
+
+
+<!-- New Version -->
+
+<div class="container">
+    <a href="/home"><button class="backButton" type="button" onclick="alert('Going back home!')">Go Back</button></a>
+    
+    <h1 class="test-center">{{ title }}</h1>
+    <a href="/how-to"><button class="helpButton" type="button", onclick="alert('Want some help? We know where to go!')">Help Page</button></a><br>
+    <p>Please log in to start building your custom-made list!</p>
+
+    <div class="row">
+        <div class="col-6" id="formInput">
+            <form (ngSubmit)="onSubmit()" #f="ngForm">
+                <div id="user-data"
+                ngModelGroup="userData"
+                #userData="ngModelGroup">
+                    <div class="form-group">
+                        <label for="uname">Username: </label>
+                        <input 
+                        type="text" 
+                        id="uname"
+                        class="form-control"
+                        ngModel
+                        name="uname"
+                        required
+                        text 
+                        #uname="ngModel">
+                        
+                        @if (!uname.valid && uname.touched) {
+                            <span class="help-block" ng-invalid ng-touched>All users must have a username! (Duh.)</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pword">Password: </label>
+                        <input
+                        type="password" 
+                        id="pword" 
+                        class="form-control"
+                        ngModel
+                        name="pword"
+                        required
+                        password
+                        #pword = "ngModel">
+
+                        @if (!pword.valid && pword.touched) {
+                            <span class="help-block">Enter a valid password please!</span>
+                        }
+
+                    </div>  
+                </div>
+                
+                <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="!f.valid">Submit</button>
+            
+            </form>
+
+            @if (!userData.valid && userData.touched) {
+                <span>Please enter valid credentials in English.</span>
+            }
+
+        </div>
+
+    <a href="/new-account" class="link1" 
+    onclick="alert('Make an account and start planning!')">
+    No Account? Click here to make one!
+    </a><br><br>
+
+    <a href="/new-password" class="link2"
+    onclick="alert('Forgot your password? We\'ll give you a chance to make a new one!')">
+    Forgot your password? Click here to get a new one!
+    </a><br><br>
+
+    </div>
+</div>
+
+
+<!-- Version 3 -->
+
+
+<!-- Container to set up the Auth0 sign-in widget -->
+
+<!-- <div class="pt-5">
+    <div id="auth0-sign-in-widget" class="pt-5"></div>
+</div> -->
+
+
+<!-- <button (click)="loginWithRedirect()" class="button login">Log In</button> -->
+
+

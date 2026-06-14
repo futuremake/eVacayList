@@ -1,0 +1,161 @@
+<!-- <p>new-account works!</p> -->
+
+<!-- <a href="/log-in"><button class="backButton" type="button"  onclick="alert('Did you remember your account? Then go ahead and put it in!')">Go Back</button></a><br>
+
+<h1>Sign-in Sheet!</h1>
+
+<p>Make your account here!</p>
+
+<form>
+    <label class="label1" for="aemail">Email: </label>
+    <input class="field1" type="text" id="aemail" name="aemail"><br><br>
+    <label class="label2" for="ausername">New Username: </label>
+    <input class="field2" type="text" id="ausername" name="ausername"><br><br>
+    <label class="label3" for="apassword">New Password: </label>
+    <input class="field3" type="text" id="apassword" name="apassword"><br><br>
+    <label class="label4" for="acpassword">Confirm Password: </label>
+    <input class="field4" type="text" id="acpassword" name="apassword"><br><br>
+    <label class="label5" for="apasscode">Secret Passcode: </label>
+    <input class="field5" type="text" id="apasscode" name="apasscode">
+</form>
+
+<p>*Save your password and passcode. Share them with no one!</p>
+
+<a href="/log-in"><button class="saveButton" type="button" onclick="alert('You have your account, so try it out by logging in!')">Save</button></a> -->
+
+<div class="container">
+    <a href="/log-in"><button class="backButton" type="button" onclick="alert('Going back to The Bouncer Screen!')">Go Back</button></a>
+    
+    <h1 class="test-center">{{ title }}</h1>
+
+    <a href="/how-to"><button class="helpButton" type="button", onclick="alert('Want some help? We know where to go!')">Help Page</button></a><br>
+    
+    <p>Make your account here!</p>
+
+    <div class="row">
+        <div class="col-6" id="formInput">
+            <form (ngSubmit)="onSubmit()" #f="ngForm">
+                <div id="user-data"
+                ngModelGroup="userData"
+                #userData="ngModelGroup">
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input
+                        type="email" 
+                        id="email" 
+                        class="form-control"
+                        ngModel
+                        name="email"
+                        required
+                        email
+                        #email="ngModel">
+                        
+                        @if (!email.valid && email.touched) {
+                            <span class="help-block ng-invalid ng-touched">Give us a decent email please!</span>
+                        }
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username: </label>
+                        <input 
+                        type="text" 
+                        id="username"
+                        class="form-control"
+                        ngModel
+                        name="username"
+                        required
+                        text
+                        #username="ngModel">
+                        
+                        @if (!username.valid && username.touched) {
+                            <span class="help-block" ng-invalid ng-touched>All users must have a username! (Duh.)</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="npassword">New Password: </label>
+                        <input
+                        type="password" 
+                        id="npassword" 
+                        class="form-control"
+                        ngModel
+                        name="npassword"
+                        required
+                        password
+                        #npassword="ngModel">
+
+                        @if (!npassword.valid && npassword.touched) {
+                            <span class="help-block" ng-invalid ng-touched>Enter a valid password please!</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpassword">Confirm Password: </label>
+                        <input
+                        type="password" 
+                        id="cpassword" 
+                        class="form-control"
+                        ngModel
+                        name="cpassword"
+                        required
+                        password
+                        #cpassword="ngModel">
+
+                        @if ((cpassword.value != npassword.value) && cpassword.touched ) {
+                            <span class="help-block" ng-invalid ng-touched>Make sure that you got your password right!</span>
+                        }
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passcode">New passcode:</label>
+                        <input
+                        type="password"
+                        id="passcode"
+                        class="form-control"
+                        ngModel
+                        name="passcode"
+                        required
+                        password
+                        #passcode="ngModel">
+
+                        @if (!passcode.valid && passcode.touched) {
+                            <span class="help-block" ng-invalid ng-touched>Give us a decent passcode please!</span>
+                        }
+
+                    </div>
+
+                </div>
+
+                <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="!f.valid">Save</button>
+
+            </form>
+
+            @if (!userData.valid && userData.touched) {
+                <span>Please enter valid credentials in English.</span>
+            }
+
+        </div>
+
+        <!-- @if (submitted) {
+            <div class="col-6" id="displayData">
+                <h3>New user password Data:</h3>
+                <p>Email: {{ user.email }}</p>
+                <p>Username: {{ user.username }}</p>
+                <p>User's new test Password: {{ user.npassword }}</p>
+                <p>User's new test Confirm Password: {{ user.cpassword }}</p>
+                <p>User's new test Passcode: {{ user.passcode }}</p>
+            </div>
+        } -->
+
+        <p>*Make sure you remember your info, or write it down and keep it somewhere safe.</p>
+
+    </div>
+</div>

@@ -1,0 +1,20 @@
+/* General Format */
+
+/* Font Families */
+h1, p {
+    font-family: Arial, Helvetica, sans-serif; 
+    color: green;
+    text-align: center;
+}
+
+.startButton {
+    position: relative;
+    left: 47%;
+    top: 90px;
+}
+
+.helpButton {
+    position: relative;
+    left: 75%;
+    bottom: 80px;
+}

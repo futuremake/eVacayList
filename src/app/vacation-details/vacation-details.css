@@ -1,0 +1,133 @@
+h1, p, label {
+    font-family: Arial, Helvetica, sans-serif; 
+    color: green;
+}
+
+.backButton {
+    position: relative;
+    left: 30%;
+    top: 0px;
+}
+
+.profileButton {
+    position: relative;
+    left: 60%;
+    bottom: 80px;
+}
+
+.deleteButton {
+    position: relative;
+    left: 80%;
+    bottom: 225px;
+}
+
+/* .saveButton {
+    position: relative;
+    left: 60%;
+    bottom: 40px;
+} */
+
+.searchButton {
+    position: relative;
+    left: 55%;
+    top: 0px;
+}
+
+.searchBox {
+    position: relative;
+    left: 55%;
+    top: 0px;
+}
+
+.addExcurButton {
+    position: relative;
+    left: 30%;
+    top: 50px;
+}
+
+/* li {
+    font-family: Arial, Helvetica, sans-serif;
+    color: green;
+}
+
+ul {
+    position: relative;
+    left: 40%;
+} */
+
+/* .label1 {
+    position: relative;
+    left: 30%;
+}
+
+.field1 {
+    position: relative;
+    left: 30%;
+}
+
+.label2 {
+    position: relative;
+    left: 50%;
+    bottom: 40px;
+}
+
+.field2 {
+    position: relative;
+    left: 50%;
+    bottom: 40px;
+}
+
+.label3 {
+    position: relative;
+    left: 30%;
+}
+
+.field3 {
+    position: relative;
+    left: 30%;
+}
+
+.label4 {
+    position: relative;
+    left: 50%;
+    bottom: 40px;
+}
+
+.field4 {
+    position: relative;
+    left: 50%;
+    bottom: 40px;
+}
+
+.label5 {
+    position: relative;
+    left: 30%;
+}
+
+.field5 {
+    position: relative;
+    left: 30%;
+} */
+
+
+/* New Version */
+
+.container {
+    margin-top: 30px;
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+form * {
+    margin: 10px 0px;
+}
+
+h1, p, label {
+    color: green;
+} 
+
+textarea.ng-invalid.ng-touched {
+    border: 1px solid red;
+}

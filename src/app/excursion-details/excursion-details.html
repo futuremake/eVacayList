@@ -1,0 +1,123 @@
+<!-- <p>excursion-details works!</p> -->
+
+<!-- <a href="/vacation-details"><button type="button" class="backButton" onclick="alert('Let\'s see the big picture of this vacation plan.')">Go Back</button></a><br>
+
+<h1>Excur 1 Details:</h1>
+
+<a href="/profile"><button class="profileButton" type="button" onclick="alert('We\'ve got your identification right here!')">Profile</button></a><br><br>
+
+<form>
+    <label class="label1" for="etitle">Title: </label>
+    <input class="field1" type="text" id="etitle" name="etitle"><br><br>
+    <label class="label2" for="estartdate">Start Date: </label>
+    <input class="field2" type="text" id="estartdate" name="estartdate"><br><br>
+    <label class="label3" for="edescription">Description: </label>
+    <input class="field3" type="text" id="edescription" name="edescription"><br>
+</form><br>
+
+<a href="/vacation-details"><button class="saveButton" type="button" onclick="alert('Let\'s put this excursion on the vacation!')">Save</button></a> -->
+
+
+<!-- New Version -->
+
+<button type="button" class="backButton" (click)="vacationDetailsReturn()">Go Back</button><br>
+
+<h1>{{ ExcurTitle }}</h1>
+
+<button class="profileButton" type="button" (click)="profilePath()">Profile</button><br><br>
+
+<button class="deleteButton" type="button" (click)="deleteExcur()">Delete Excursion?</button>
+
+<div class="container">
+    <div class="row">
+        <div class="col-6" id="formInput">
+            <form (ngSubmit)="onSubmit()" #f="ngForm">
+                <div
+                id="user-data"
+                ngModelGroup="userData"
+                #userData="ngModelGroup">
+                    <div class="form-group">
+                        <label for="excursion_title">Title:</label>
+                        <input
+                        type="text"
+                        id="excursion_title"
+                        class="form-control"
+                        ngModel
+                        name="excursion_title"
+                        required
+                        text
+                        #excursion_title="ngModel"
+                        placeholder="{{ this.chosenExcursion.title }}">
+
+                        @if (!excursion_title.valid && excursion_title.touched) {
+                            <span class="help-block">If you're gonna plan an event, you need to give it a name.</span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input
+                        type="text"
+                        id="start_date"
+                        class="form-control"
+                        ngModel
+                        name="start_date"
+                        required
+                        text
+                        #start_date="ngModel"
+                        placeholder="{{ this.chosenExcursion.start_date }}">
+
+                        @if (!start_date.valid && start_date.touched) {
+                            <span class="help-block">Come on, tell us. When is this event happening?</span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <!-- <input
+                        type="text"
+                        id="description"
+                        class="form-control"
+                        ngModel
+                        name="description"
+                        required
+                        text
+                        #description="ngModel"> -->
+
+                        <textarea
+                        type="text"
+                        id="description"
+                        class="form-control"
+                        ngModel
+                        name="description"
+                        required
+                        text
+                        #description="ngModel"
+                        placeholder="{{ this.chosenExcursion.description }}"></textarea>
+
+                        @if (!description.valid && description.touched) {
+                            <span class="help-block">So? What's this excursion about?</span>
+                        }
+
+                    </div>
+            
+                </div>
+
+                <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="!f.valid">Save</button>
+            </form>
+        </div>
+
+        <!-- @if (submitted) {
+            <div class="col-6" id="displayData">
+                <h3>Excursion Data:</h3>
+                <p>Title: {{ excursion.excursion_title }}</p>
+                <p>Start Date: {{ excursion.start_date }}</p>
+                <p>Description: {{ excursion.description }}</p>
+            </div>
+        } -->
+        
+    </div>
+</div>

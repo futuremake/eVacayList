@@ -1,0 +1,48 @@
+h1, p {
+    font-family: Arial, Helvetica, sans-serif; 
+    color: green;
+    text-align: center;
+}
+
+/* li {
+    font-family: Arial, Helvetica, sans-serif;
+    color: green;
+}
+
+ul {
+    position: relative;
+    left: 40%;
+} */
+
+.logOutButton {
+    position: relative;
+    left: 30%;
+    top: 0px;
+}
+
+.profileButton {
+    position: relative;
+    left: 60%;
+    bottom: 80px;
+}
+
+.searchButton {
+    position: relative;
+    /* left: 70%; */
+    /* bottom: 135px; */
+    left: 40%;
+    top: 15px;
+}
+
+.searchBox {
+    position: relative;
+    left: 41%;
+    top: 15px;
+    bottom: 0px;
+}
+
+.addVacayButton {
+    position: relative;
+    left: 25%;
+    bottom: 40px;
+}
