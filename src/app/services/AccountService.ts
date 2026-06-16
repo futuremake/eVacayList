@@ -4,6 +4,8 @@ import { Account } from '../models/account.model';
 import { DocumentReference, DocumentData, Firestore, collectionData, query } from '@angular/fire/firestore';
 import { addDoc, updateDoc, collection, orderBy } from 'firebase/firestore';
 import { timestamp } from 'rxjs';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 type CurrentAccount = {
   id: number | undefined;
@@ -12,6 +14,21 @@ type CurrentAccount = {
   password: string | undefined;
   passcode: string | undefined;
 }
+
+const firebaseConfig = {
+        apiKey: "AIzaSyBY46CRU09sgwBGX75jfZOQhVzVoz3eMxQ",
+        authDomain: "evacaylist.firebaseapp.com",
+        projectId: "evacaylist",
+        storageBucket: "evacaylist.firebasestorage.app",
+        messagingSenderId: "46775024805",
+        appId: "1:46775024805:web:a633f37ebf25fe87bb614c",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize FireStore and get a reference to the service
+const db = getFirestore(app);
 
 @Injectable({
   providedIn: 'root',
@@ -65,9 +82,9 @@ constructor(private http: HttpClient) { }
   baseUrl = 'http://localhost:8080/api/accounts';
   
   // The Variables
-  firestore: Firestore = inject(Firestore);
+  // firestore: Firestore = inject(Firestore);
 
-  // Create an Account on the Api
+  // // Create an Account on the Api
   // public async createAccount(username: string | undefined, email: string | undefined, password: string | undefined, passcode: string | undefined) {
   //   try {
   //     const response = await fetch( this.baseUrl, {
@@ -104,55 +121,55 @@ constructor(private http: HttpClient) { }
   //   }
   // }
 
-  // Create an Account on Cloud Firestore.
-  createAccount = async (newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined):
-  Promise<void | DocumentReference<DocumentData>> => {
+  // // Create an Account on Cloud Firestore.
+  // createAccount = async (newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined):
+  // Promise<void | DocumentReference<DocumentData>> => {
 
-    // Can't make an account with missing values
-    if (!newUsername || !newEmail || !newPassword || !newPasscode) {
-      console.log('We can\'t add an account with missing values.\n ' 
-        + newUsername + '\n' 
-        + newEmail + '\n' 
-        + newPassword + '\n' 
-        + newPasscode);
+  //   // Can't make an account with missing values
+  //   if (!newUsername || !newEmail || !newPassword || !newPasscode) {
+  //     console.log('We can\'t add an account with missing values.\n ' 
+  //       + newUsername + '\n' 
+  //       + newEmail + '\n' 
+  //       + newPassword + '\n' 
+  //       + newPasscode);
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const futureAccount: CurrentAccount = {
-      id: undefined,
-      username: newUsername,
-      email: newEmail,
-      password: newPassword,
-      passcode: newPasscode,
-    };
+  //   const futureAccount: CurrentAccount = {
+  //     id: undefined,
+  //     username: newUsername,
+  //     email: newEmail,
+  //     password: newPassword,
+  //     passcode: newPasscode,
+  //   };
 
-    futureAccount.id = undefined
-    newUsername && (futureAccount.username = newUsername);
-    newEmail && (futureAccount.email = newEmail);
-    newPassword && (futureAccount.password = newPassword);
-    newPasscode && (futureAccount.passcode = newPasscode);
+  //   futureAccount.id = undefined
+  //   newUsername && (futureAccount.username = newUsername);
+  //   newEmail && (futureAccount.email = newEmail);
+  //   newPassword && (futureAccount.password = newPassword);
+  //   newPasscode && (futureAccount.passcode = newPasscode);
 
-    console.log('New Account Data:\n' 
-        + newUsername + '\n' 
-        + newEmail + '\n' 
-        + newPassword + '\n' 
-        + newPasscode);
+  //   console.log('New Account Data:\n' 
+  //       + newUsername + '\n' 
+  //       + newEmail + '\n' 
+  //       + newPassword + '\n' 
+  //       + newPasscode);
     
-    // Make and save the Account
-    try {
-      const newAccountRef = await addDoc(
-        collection(this.firestore, "accounts"),
-        futureAccount,
-      );
-      console.log(newAccountRef);
+  //   // Make and save the Account
+  //   try {
+  //     const newAccountRef = await addDoc(
+  //       collection(this.firestore, "accounts"),
+  //       futureAccount,
+  //     );
+  //     console.log(newAccountRef);
 
-      return newAccountRef;
-    } catch (error) {
-      console.error('Error writing new account to Firebase Database: ' + error);
-      return;
-    }
-  }
+  //     return newAccountRef;
+  //   } catch (error) {
+  //     console.error('Error writing new account to Firebase Database: ' + error);
+  //     return;
+  //   }
+  // }
 
 
   // Get all the accounts from the Api
@@ -280,4 +297,40 @@ constructor(private http: HttpClient) { }
       }
     }
   }
+
+
+  // Version 3
+
+  public async createAccount(newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined) {
+
+    // Add a new document in collection 'accounts'
+    // var accountsRef = db.collection("accounts");
+
+    try {
+      const accountRef = await addDoc(collection(db, "accounts"), {
+        username: newUsername,
+        email: newEmail,
+        password: newPassword,
+        passcode: newPasscode,
+      });
+
+      await updateDoc(accountRef, {
+        id: accountRef
+      });
+
+      console.log("Document written with id: " + accountRef.id);
+
+      return accountRef;
+
+    } catch (error) {    
+      if (error instanceof Error) {
+        console.log('Error message: ', error.message);
+        return error.message;
+      } else {
+        console.log('Unexpected Error: ', error);
+        return 'An unexpected error occurred.'
+      }
+    }
+  }
+
 }
