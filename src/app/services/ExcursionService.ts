@@ -1,6 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Excursion } from '../models/excursion.model';
+import { DocumentReference, DocumentData, Firestore, query, collectionData } from '@angular/fire/firestore';
+import { addDoc, collection, orderBy } from 'firebase/firestore';
+
+type CurrentExcursion = {
+  id: number | undefined;
+  account_id: number | undefined;
+  vacation_id: number | undefined;
+  title: string | undefined;
+  start_date: string | undefined;
+  description: string | undefined;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -50,7 +61,10 @@ export class ExcursionService {
 
   // The URL of the Api
   baseUrl: string = 'http://localhost:8080/api/excursions';
-  
+    
+  // The Variables
+  firestore: Firestore = inject(Firestore);
+
   // The imported service
   constructor(private http: HttpClient) { }
 
@@ -97,15 +111,68 @@ export class ExcursionService {
     }
   }
 
+  // // Create an Excursion in the Firebase Database.
+  // createExcursion = async(newAccountId: number | undefined, newVacationId: number | undefined, newTitle: string | undefined, 
+  //   newStartDate: string | undefined, newDescription: string | undefined):
+  //   Promise<void | DocumentReference<DocumentData>> => {
+
+  //     // Can't make an Excursion with missing values
+  //     if (!newAccountId || !newVacationId || !newTitle || !newStartDate || !newDescription){
+  //       console.log('We can\'t make an Excursion with missing values:\n '
+  //         + newAccountId + '\n'
+  //         + newVacationId + '\n'
+  //         + newTitle + '\n'
+  //         + newStartDate + '\n'
+  //         + newDescription);
+
+  //       return;
+  //     }
+
+  //     const futureExcursion: CurrentExcursion = {
+  //       id: undefined,
+  //       account_id: newAccountId,
+  //       vacation_id: newVacationId,
+  //       title: newTitle,
+  //       start_date: newStartDate,
+  //       description: newDescription
+  //     }
+
+  //     futureExcursion.id = undefined
+  //     newAccountId && (futureExcursion.account_id = newAccountId);
+  //     newVacationId && (futureExcursion.vacation_id = newVacationId);
+  //     newTitle && (futureExcursion.title = newTitle);
+  //     newStartDate && (futureExcursion.start_date = newStartDate);
+  //     newDescription && (futureExcursion.description = newDescription);
+
+  //     // Make and save the new Excursion to the Firebase Database
+  //     try {
+  //       const newExcursionRef = await addDoc(
+  //         collection(this.firestore, "excursions"),
+  //         futureExcursion
+  //       );
+  //     } catch (error) {
+  //       console.error('Error writing new Excursion to Firebase Database: ' + error);
+  //       return;
+  //     }
+  //   }
+
   // Retrieve all excursions in the Api
   public retrieve() {
     return this.http.get<any>(this.baseUrl, { });
   }
 
-  // Retrieve information about a vacation's specific excursion
-  // public retrieveVacationExcursions(excursionId: number | undefined) {
-  //   return this.http.get<any>(this.baseUrl + '/' + excursionId, { });
+  // // Retrieve all excursions in the Firebase Database
+  // retrieve = () => {
+  //   // Create the query to load all the excursions and listen for new ones.
+  //   const excursionsQuery = query(collection(this.firestore, 'excursions'), orderBy('timestamp', 'desc'));
+  //   // Start listening to the query
+  //   return collectionData(excursionsQuery);
   // }
+
+  // // Retrieve information about a vacation's specific excursion
+  // // public retrieveVacationExcursions(excursionId: number | undefined) {
+  // //   return this.http.get<any>(this.baseUrl + '/' + excursionId, { });
+  // // }
 
   // Update a excursion in the Api
   public async updateExcursion(excursionId: number | undefined, title: string | undefined, startDate: string | undefined,

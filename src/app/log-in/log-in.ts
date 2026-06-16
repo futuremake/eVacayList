@@ -1,10 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AccountService } from '../services/AccountService';
 import { Account } from '../models/account.model';
 import { Router } from '@angular/router';
 import { CommunicationService } from '../services/CommunicationService';
-
+import { AsyncPipe } from '@angular/common';
+import { DocumentData } from 'firebase/firestore';
+import { Observable } from 'rxjs';
 @Component({
   selector: 'app-log-in',
   imports: [ FormsModule ],
@@ -94,4 +96,10 @@ export class LogIn {
       alert("Sorry, we don't have your account. Try again!");
     }
   }
+
+
+  // Version 3
+
+
+
 }
