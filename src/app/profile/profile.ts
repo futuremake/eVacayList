@@ -37,6 +37,8 @@ export class Profile implements OnInit {
 
   vacations: Vacation[] = [];
 
+  result: any = undefined;
+
   // The imported services
   constructor(private commService: CommunicationService, private router: Router, private accountService: AccountService,
     private vacationService: VacationService) {}
@@ -56,56 +58,82 @@ export class Profile implements OnInit {
       console.log("Retrieved Account Id: " + this.receivedAccountId);
     });
 
-    // Retrieving the account and showing its' details
-    this.accountService.retrieve().subscribe((data) => {
-      if (data._embedded == undefined) {
-        console.log(data);
-        // this.user.id = data.id;
-        // this.user.email = data.email;
-        // this.user.username = data.username;
+    // // Retrieving the account and showing its' details
+    // this.accountService.retrieve().subscribe((data) => {
+    //   if (data._embedded == undefined) {
+    //     console.log(data);
+    //     // this.user.id = data.id;
+    //     // this.user.email = data.email;
+    //     // this.user.username = data.username;
 
-        this.currentAccount.id = data.id;
-        this.currentAccount.username = data.username;
-        this.currentAccount.email = data.email;
-        this.currentAccount.password = data.password;
-        this.currentAccount.passcode = data.passcode;
-      } else {
-        for (let account of data._embedded.accounts) {
-          console.log(data);
-          if(account.id == this.receivedAccountId) {
-            // this.user.id = account.id;
-            // this.user.email = account.email;
-            // this.user.username = account.username;
+    //     this.currentAccount.id = data.id;
+    //     this.currentAccount.username = data.username;
+    //     this.currentAccount.email = data.email;
+    //     this.currentAccount.password = data.password;
+    //     this.currentAccount.passcode = data.passcode;
+    //   } else {
+    //     for (let account of data._embedded.accounts) {
+    //       console.log(data);
+    //       if(account.id == this.receivedAccountId) {
+    //         // this.user.id = account.id;
+    //         // this.user.email = account.email;
+    //         // this.user.username = account.username;
             
-            this.currentAccount.id = account.id;
-            this.currentAccount.email = account.email;
-            this.currentAccount.username = account.username;
-            this.currentAccount.password = account.password;
-            this.currentAccount.passcode = account.passcode;
-          }
+    //         this.currentAccount.id = account.id;
+    //         this.currentAccount.email = account.email;
+    //         this.currentAccount.username = account.username;
+    //         this.currentAccount.password = account.password;
+    //         this.currentAccount.passcode = account.passcode;
+    //       }
+    //     }
+    //   }
+    // });
+
+    // Retrieving the account from Firestore and showing its details
+    this.accountService.retrieveAccounts().then((data) => {
+      console.log("Data recieved: " + data);
+      data.forEach(item => {
+        if (item.id == this.receivedAccountId) {
+          console.log("Account found: " + item);
+          this.currentAccount.id = item.id;
+          this.currentAccount.email = item.email;
+          this.currentAccount.username = item.username;
+          this.currentAccount.password = item.password;
+          this.currentAccount.passcode = item.passcode;
         }
-      }
+      });
     });
 
-    // Checking if this account has any vacations in it
-    this.vacationService.retrieve().subscribe((data) => {
-      console.log(data);
-      if (data._embedded == undefined){
-        this.vacations = data;
-        if (this.vacations[0].account_id == this.receivedAccountId) {
-            this.hasVacay = true;
-            console.log('Does this Account have any vacations? ' + this.hasVacay);
-          }
-      } else {
-        for (let vacation of data._embedded.vacations) {
-          if (vacation.account_id == this.receivedAccountId) {
-            this.hasVacay = true;
-            console.log('Does this Account have any vacations? ' + this.hasVacay);
-            break;
-          }
+    // // Checking if this account has any vacations in it
+    // this.vacationService.retrieve().subscribe((data) => {
+    //   console.log(data);
+    //   if (data._embedded == undefined){
+    //     this.vacations = data;
+    //     if (this.vacations[0].account_id == this.receivedAccountId) {
+    //         this.hasVacay = true;
+    //         console.log('Does this Account have any vacations? ' + this.hasVacay);
+    //       }
+    //   } else {
+    //     for (let vacation of data._embedded.vacations) {
+    //       if (vacation.account_id == this.receivedAccountId) {
+    //         this.hasVacay = true;
+    //         console.log('Does this Account have any vacations? ' + this.hasVacay);
+    //         break;
+    //       }
+    //     }
+    //   }
+    // });
+
+    // Checking if this account has any vacations in it from Firestore
+    this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
+      console.log("Vacations retrieved from this account: " + data.length);
+      data.forEach(item => {
+        if (item != undefined && item.account_id == this.receivedAccountId) {
+          this.hasVacay = true;
         }
-      }
+      });
     });
+    console.log('Does this Account have any vacations? ' + this.hasVacay);
 
   }
 
@@ -132,17 +160,28 @@ export class Profile implements OnInit {
     this.currentAccount.email = this.updateForm.value.userData.email;
     this.currentAccount.username = this.updateForm.value.userData.username;
     
-    this.accountService.updateAccount(this.currentAccount.id, this.currentAccount.username, this.currentAccount.email, 
-    this.currentAccount.password, this.currentAccount.passcode);
-    alert('You have successfully updated your account!');
-    this.router.navigate(['/vacation-list']);
+    this.result = this.accountService.editAccount(this.currentAccount.id, this.currentAccount.username, this.currentAccount.email, 
+      this.currentAccount.password, this.currentAccount.passcode);
+    
+    // Make sure the profile info was really changed
+    if (this.result != undefined && this.result != -1) {
+      alert('You have successfully updated your account!');
+      this.commService.transmitData(this.receivedAccountId);
+      this.router.navigate(['/vacation-list']);
+    
+    // Catch any Errors that occur
+    } else {
+
+    }
+    
+    
   }
 
   // Deleting an account
   removeAccount(): void {
 
     // If the Account doesn't exist, don't delete.
-    if (this.receivedAccountId == undefined || this.receivedAccountId < 0) {
+    if (this.receivedAccountId == undefined || this.receivedAccountId == -1) {
       console.log('You can\'t delete an account that doesn\'t exist!');
       alert('You can\'t delete an account that doesn\'t exist!');
     } else {
@@ -154,10 +193,17 @@ export class Profile implements OnInit {
 
       // If the account has no vacations, then delete.
       } else {
-        this.accountService.deleteAccount(this.currentAccount.id);
-        console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
-        alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
-        this.router.navigate(['/home']);
+        this.result = undefined;
+
+        this.result = this.accountService.removeAccount(this.currentAccount.id);
+        
+        if (this.result != undefined && this.result != -1) {
+          console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
+          alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
+          this.router.navigate(['/home']);
+        } else {
+          console.log('Sorry, an Error has occurred. If you really want to delete your account, wait until later.')
+        }
       }
     } 
   }

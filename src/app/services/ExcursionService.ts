@@ -2,7 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Excursion } from '../models/excursion.model';
 import { DocumentReference, DocumentData, Firestore, query, collectionData } from '@angular/fire/firestore';
-import { addDoc, collection, orderBy } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 
 type CurrentExcursion = {
   id: number | undefined;
@@ -12,6 +13,21 @@ type CurrentExcursion = {
   start_date: string | undefined;
   description: string | undefined;
 }
+
+const firebaseConfig = {
+        apiKey: "AIzaSyBY46CRU09sgwBGX75jfZOQhVzVoz3eMxQ",
+        authDomain: "evacaylist.firebaseapp.com",
+        projectId: "evacaylist",
+        storageBucket: "evacaylist.firebasestorage.app",
+        messagingSenderId: "46775024805",
+        appId: "1:46775024805:web:a633f37ebf25fe87bb614c",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize FireStore and get a reference to the service
+const db = getFirestore(app);
 
 @Injectable({
   providedIn: 'root',
@@ -47,69 +63,59 @@ export class ExcursionService {
   //   description: 'The biggest State Fair in America. See the best of the Lone Star State at the Texas State Fair!'
   // }]
 
-  // constructor() { }
-
-  // public getExcursions(): any {
-  //   const excursionObservable = new Observable(observer => {
-  //     setTimeout(() => {
-  //       observer.next(this.excursions);
-  //     }, 1000);
-  //   })
-
-  //   return excursionObservable;
-  // }
-
   // The URL of the Api
   baseUrl: string = 'http://localhost:8080/api/excursions';
     
   // The Variables
-  firestore: Firestore = inject(Firestore);
+  // firestore: Firestore = inject(Firestore);
+  currentExcursion: Excursion = new Excursion();
+  excursionArray: Excursion[] = [];
 
   // The imported service
   constructor(private http: HttpClient) { }
 
   // Create an excursion in the Api
-  public async createExcursion(accountId: number | undefined, vacationId: number | undefined, title: string | undefined, 
-    startDate: string | undefined, description: string | undefined) {
-    console.log('Excur Service accountId: ' + accountId);
-    console.log('Excur Service vacationId: ' + vacationId);
-    console.log('Excur Service title: ' + title);
-    console.log('Excur Service startDate: ' + startDate);
-    console.log('Excur Service description: ' + description);
-    try {
-      const response = await fetch(this.baseUrl,  {
-        method: 'POST',
-        body: JSON.stringify({
-          accountId: accountId,
-          vacationId: vacationId,
-          title: title,
-          startDate: startDate,
-          description: description
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-      });
+  // public async createExcursion(accountId: number | undefined, vacationId: number | undefined, title: string | undefined, 
+  //   startDate: string | undefined, description: string | undefined) {
+  //   console.log('Excur Service accountId: ' + accountId);
+  //   console.log('Excur Service vacationId: ' + vacationId);
+  //   console.log('Excur Service title: ' + title);
+  //   console.log('Excur Service startDate: ' + startDate);
+  //   console.log('Excur Service description: ' + description);
+  //   try {
+  //     const response = await fetch(this.baseUrl,  {
+  //       method: 'POST',
+  //       body: JSON.stringify({
+  //         accountId: accountId,
+  //         vacationId: vacationId,
+  //         title: title,
+  //         startDate: startDate,
+  //         description: description
+  //       }),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Accept: 'application/json'
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`Error! Status: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`Error! Status: ${response.status}`);
+  //     }
 
-      const result = (await response.json()) as Excursion;
-      console.log('Result is: ', JSON.stringify(result, null, 4));
-      return result;
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        console.log('Error message: ', error.message);
-        return error.message;
-      } else {
-        console.log('Unexpected Error: ', error)
-        return 'An unexpected error has occurred.';
-      }
-    }
-  }
+  //     const result = (await response.json()) as Excursion;
+  //     console.log('Result is: ', JSON.stringify(result, null, 4));
+  //     return result;
+  //   }
+  //   catch (error) {
+  //     if (error instanceof Error) {
+  //       console.log('Error message: ', error.message);
+  //       return error.message;
+  //     } else {
+  //       console.log('Unexpected Error: ', error)
+  //       return 'An unexpected error has occurred.';
+  //     }
+  //   }
+  // }
 
   // // Create an Excursion in the Firebase Database.
   // createExcursion = async(newAccountId: number | undefined, newVacationId: number | undefined, newTitle: string | undefined, 
@@ -241,5 +247,113 @@ export class ExcursionService {
         return 'An unexpected error has occurred.';
       }
     }
+  }
+
+  // Create an Excursion in the Firestore database
+  public async createExcursion (newAccountId: number | undefined, newVacationId: number | undefined, 
+    newTitle: string | undefined, newStartDate: string | undefined, newDescription: string | undefined) {
+
+      try {
+        const excursionRef = await addDoc(collection(db, "excursions"), {
+          account_id: newAccountId,
+          vacation_id: newVacationId,
+          title: newTitle,
+          start_date: newStartDate,
+          description: newDescription,
+        });
+
+        await updateDoc(excursionRef, {
+          id: excursionRef.id
+        });
+
+        return excursionRef.id;
+
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown Error: " + error);
+          return "An Unknown Error has occurred.";
+        } 
+      }
+  }
+
+  // Retrieve an excursion from the FireStore Database
+  public async retrieveExcursions(accountId: number | undefined) {
+
+    const excursionRef = collection(db, "excursions")
+    const q = query(excursionRef, where("account_id", "==", accountId));
+    const querySnapshot = await getDocs(q);
+
+    this.excursionArray = [];
+
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id + " => " );
+      console.log(doc.data());
+      this.currentExcursion.id = doc.data()['id'];
+      this.currentExcursion.account_id = doc.data()['account_id'];
+      this.currentExcursion.vacation_id = doc.data()['vacation_id'];
+      this.currentExcursion.title = doc.data()['title'];
+      this.currentExcursion.start_date = doc.data()['start_date'];
+      this.currentExcursion.description = doc.data()['description'];
+      this.excursionArray.push(this.currentExcursion);
+      this.currentExcursion = new Excursion();
+    });
+
+    return this.excursionArray;
+  }
+
+  // Update an Excursion in the Firebase database
+  public async editExcursion(excursionId: number | undefined, accountId: number | undefined, editTitle: string | undefined,
+    editStartDate: string | undefined, editDescription: string | undefined) {
+    
+    try {
+      if (excursionId != undefined && accountId != undefined) {
+        const editRef = doc(db, "excursions", excursionId?.toString());
+
+        const e = await updateDoc(editRef, {
+          id: excursionId,
+          account_id: accountId,
+          title: editTitle,
+          start_date: editStartDate,
+          description: editDescription
+        });
+        return e;
+      }
+    } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+      }
+    return -1;
+  }
+
+
+  // Delete an Excursion in the Firebase database
+  public async removeExcursion (excursionId: number | undefined) {
+
+    try {
+      if (excursionId != undefined) {
+        const removeRef = doc(db, "excursions", excursionId.toString());
+        const r = await deleteDoc(removeRef);
+
+        return r;
+      }
+    } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+      }
+
+    return -1;
   }
 }

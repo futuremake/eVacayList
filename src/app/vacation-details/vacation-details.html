@@ -40,7 +40,7 @@
 
 <h1 class="text-center">{{ vacayTitle }}</h1>
 
-<button class="profileButton" type="button" (click)="profilePath()" onclick="alert('We\'ve got your identification right here!')">Profile</button><br><br>
+<button class="profileButton" type="button" (click)="profilePath()">Profile</button><br><br>
 
 <!-- <button class="searchButton" type="button" onclick="alert('The Search button is still under construction. Please be patient!')">Search</button><br><br> -->
 
@@ -166,6 +166,8 @@
             </form>         
         </div>
 
+        <p>* Make sure you set your vacation start date at least 2 days after today. Everyone needs time to prepare for a trip.</p>
+
         <!-- @if (submitted) {
             <div class="col-6" id="displayData">
                 <h3>Your Vacation Data:</h3>
@@ -187,7 +189,8 @@
 </ul> -->
 
 <button class="addExcurButton" type="button" 
-(click)="addExcurPath()">Add Excursion?</button><br>
+    onclick="alert('Sorry, but we are still working on the excursion features. Please focus on vacations for now.')"
+    >Add Excursion?</button><br>
 
 <form (submit)="onListSubmit()" #lf="ngForm">
     <div

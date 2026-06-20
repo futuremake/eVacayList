@@ -37,7 +37,7 @@ export class HowTo implements OnInit {
     }
 
     // Send the user back to the vacation list page.
-    if (this.receivedAccountId != undefined && this.receivedAccountId >= 0){
+    if (this.receivedAccountId != undefined && this.receivedAccountId != -1){
       alert('Going back to the Vacation List page!');
       this.commService.transmitData(this.receivedAccountId);
       this.router.navigate(['/vacation-list']);

@@ -48,13 +48,20 @@ export class NewAccount {
       this.newAccount.username = this.signupForm.value.userData.username;
       this.newAccount.password = this.signupForm.value.userData.npassword;
       this.newAccount.passcode = this.signupForm.value.userData.passcode;
+    } else {
+      alert("Make sure you got your new password written right!");
+      this.signupForm.reset();
     }
+    
     this.signupForm.reset();
 
     const result = this.accountService.createAccount(this.newAccount.username, this.newAccount.email, this.newAccount.password, this.newAccount.passcode);
 
+    // setTimeout(function () {
+    //   console.log("Time to check the function!");
+    // }, 1000);
     // If the account was successfully made, go back to the log-in screen.
-    if (result !instanceof Error || result != undefined) {
+    if ((result !instanceof Error) || (result.toString() != 'An unexpected error occurred.')) {
       console.log('New account made: ', result);
       alert('New Account made! Let the vacation planning journey begin!');
       this.router.navigate(['/log-in']);

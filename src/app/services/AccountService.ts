@@ -2,10 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Account } from '../models/account.model';
 import { DocumentReference, DocumentData, Firestore, collectionData, query } from '@angular/fire/firestore';
-import { addDoc, updateDoc, collection, orderBy } from 'firebase/firestore';
+import { addDoc, updateDoc, collection, orderBy, getDocs, where, deleteDoc } from 'firebase/firestore';
 import { timestamp } from 'rxjs';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
 type CurrentAccount = {
   id: number | undefined;
@@ -83,6 +83,9 @@ constructor(private http: HttpClient) { }
   
   // The Variables
   // firestore: Firestore = inject(Firestore);
+
+  accountsArray: Account[] = [];
+  foundAccount: Account = new Account(); 
 
   // // Create an Account on the Api
   // public async createAccount(username: string | undefined, email: string | undefined, password: string | undefined, passcode: string | undefined) {
@@ -301,12 +304,10 @@ constructor(private http: HttpClient) { }
 
   // Version 3
 
-  public async createAccount(newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined) {
-
-    // Add a new document in collection 'accounts'
-    // var accountsRef = db.collection("accounts");
-
+  // Create a document in the 'accounts' collection in the Firestore Database
+  public async createAccount(newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined) {    
     try {
+      // Add a new document in collection 'accounts'
       const accountRef = await addDoc(collection(db, "accounts"), {
         username: newUsername,
         email: newEmail,
@@ -314,23 +315,193 @@ constructor(private http: HttpClient) { }
         passcode: newPasscode,
       });
 
+      // Add the generated Id to the new document
       await updateDoc(accountRef, {
-        id: accountRef
+        id: accountRef.id
       });
 
       console.log("Document written with id: " + accountRef.id);
+      return accountRef.id;
 
-      return accountRef;
-
-    } catch (error) {    
+    } catch (error) {
+      // Stop if something went wrong happened    
       if (error instanceof Error) {
         console.log('Error message: ', error.message);
         return error.message;
       } else {
         console.log('Unexpected Error: ', error);
-        return 'An unexpected error occurred.'
+        return 'An unexpected error occurred.';
       }
     }
   }
 
+  // Get all the accounts from the Firestore Database
+  public async retrieveAccounts() { 
+
+    // // Test methods
+    // // Test 1:
+    // const docRef = doc(db, "accounts", "Md3mMvZCTJlhe9FJuwpW");
+    // console.log("Document Reference Test 1: " + docRef);
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   console.log("Test Document Account Data 1: " + docSnap.data() 
+    //   + "Account id: " + docSnap.id
+    //   + docSnap.id);
+    // } else {
+    //   // docSnap.data() will be undefined in this case
+    //   console.log("Sorry, Test Document Account failed this time.");
+    // }
+
+    // // Test 2:
+    // const docRef2 = doc(db, "accounts", "iEWIIf1j28eGjnXXCvKW");
+    // console.log("Document Reference Test 2: " + docRef2);
+    // const docSnap2 = await getDoc(docRef2);
+
+    // if (docSnap2.exists()) {
+    //   console.log("Test Document Account Data 2: " + docSnap2.data() + "Account id: " + docSnap2.id);
+    // } else {
+    //   // docSnap.data() will be undefined in this case
+    //   console.log("Sorry, Test Document Account failed this time.");
+    // }
+
+    // // Test 3:
+    // const docRef3 = doc(db, "accounts", "pmd4Saok0IVk4OGtiMYY");
+    // console.log("Document Reference Test 3: " + docRef3);
+    // const docSnap3 = await getDoc(docRef3);
+
+    // if (docSnap3.exists()) {
+    //   console.log("Test Document Account Data 3: " + docSnap3.data() + "Account id: " + docSnap.id);
+    // } else {
+    //   // docSnap.data() will be undefined in this case
+    //   console.log("Sorry, Test Document Account failed this time.");
+    // }
+
+    // // Query Snapshot tests 2
+    // const docRef4 = collection(db, 'accounts');
+    // const r = query(docRef4, where("username", "==", "FloatingSponge"));
+    // console.log("Query test 2 result: " + r);
+
+    const q = query(collection(db, 'accounts'));
+    const querySnapshot = await getDocs(q);
+
+    // Query Snapshot Tests
+    this.foundAccount = new Account();
+    this.foundAccount.id = undefined;
+    this.accountsArray = [];
+    
+    querySnapshot.forEach(doc => {
+      console.log(doc.id + " => ");
+      console.log(doc.data());
+      // console.log(doc.data()['email']);
+      this.foundAccount.id = doc.data()['id'];
+      this.foundAccount.email = doc.data()['email'];
+      this.foundAccount.username = doc.data()['username'];
+      this.foundAccount.password = doc.data()['password'];
+      this.foundAccount.passcode = doc.data()['passcode'];
+
+      this.accountsArray.push(this.foundAccount);
+      this.foundAccount = new Account();
+    });
+
+    
+
+    // return querySnapshot;
+    return this.accountsArray;
+  }
+
+  public async retrieveAccount(accountId: number | undefined) {
+
+    console.log("The Id to retrieve an account from: " + accountId);
+    const docRef = collection(db, 'accounts');
+    const q = query(docRef, where("account_id", "==", "accountId"));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id + " => " );
+      console.log(doc.data());
+      this.foundAccount.id = doc.data()['id'];
+      this.foundAccount.email = doc.data()['email'];
+      this.foundAccount.username = doc.data()['username'];
+      this.foundAccount.password = doc.data()['password'];
+      this.foundAccount.passcode = doc.data()['passcode'];
+    });
+
+    return this.foundAccount;
+
+  }
+
+
+  // Update an Account's Password on Firestore
+  public async editAccountPassword(editEmail: string | undefined, editUsername: string | undefined,
+    editPassword: string | undefined, editPasscode: string | undefined) {
+
+    const accountRef = collection(db, "accounts");
+    const q = query(accountRef, where("email", "==", editEmail), where("username", "==", editUsername), 
+    where("passcode", "==", editPasscode));
+    const querySnapShot = await getDocs(q);
+
+    this.foundAccount = new Account();
+
+    querySnapShot.forEach((doc) => {
+        if(doc.exists()) {
+          this.foundAccount.id = doc.data()['id'];
+          this.foundAccount.email = doc.data()['email'];
+          this.foundAccount.username = doc.data()['username'];
+          this.foundAccount.password = doc.data()['password'];
+          this.foundAccount.passcode = doc.data()['passcode'];
+        }
+    });
+
+    this.foundAccount.password = editPassword;
+
+    if (this.foundAccount.id != undefined){
+      const editRef = doc(db, "accounts", this.foundAccount.id.toString());
+      const e = await updateDoc(editRef, {
+        id: this.foundAccount.id,
+        email: this.foundAccount.email,
+        username: this.foundAccount.username,
+        password: this.foundAccount.password,
+        passcode: this.foundAccount.passcode,
+      });
+
+      return e;
+    }
+
+    return -1;
+  }
+
+  // Update an Account in the Firestore database
+  public async editAccount(accountId: number | undefined, editUsername: string | undefined, editEmail: string | undefined,
+    editPassword: string | undefined, editPasscode: string | undefined) {
+
+    if (accountId != undefined) {
+      const editRef = doc(db, "accounts", accountId.toString());
+      const e = await updateDoc(editRef, {
+        id: accountId,
+        email: editEmail,
+        username: editUsername,
+        password: editPassword,
+        passcode: editPasscode
+      });
+
+      return e;
+    }
+     
+    return -1;
+  }
+
+  // Delete an Account on Firestore
+  public async removeAccount(accountId: number | undefined) {
+
+    if (accountId != undefined) {
+
+      const removeRef = doc(db, "accounts", accountId.toString());
+      const r = await deleteDoc(removeRef);
+
+      return r;
+    }
+
+    return -1;
+  }
 }

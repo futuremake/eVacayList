@@ -52,6 +52,8 @@ export class ExcursionDetails implements OnInit {
 
   result: any = undefined;
 
+  checkExcursion: boolean = false;
+
   // The imported services
   constructor(private commService: CommunicationService, private excursionService: ExcursionService,
     private router: Router, private vacationService: VacationService, 
@@ -60,89 +62,63 @@ export class ExcursionDetails implements OnInit {
 
   ngOnInit(): void {
 
-    // Receiving the excursion, account, and vacation ids from the vacation details page
-    this.commService.currentDataString$.subscribe((data) => {
-      this.receivedExcurData = data;
-      console.log('Retrieved Excursion Data: ' + this.receivedExcurData);
-
-      this.dataArray = this.receivedExcurData?.split(',');
-      if (this.dataArray != undefined) {
-        this.receivedExcursionId = parseInt(this.dataArray[0]);
-        console.log('Received Excursion id:' + this.receivedExcursionId);
-        this.receivedAccountId = parseInt(this.dataArray[1]);
-        console.log('Received Account id:' + this.receivedAccountId);
-        this.receivedVacationId = parseInt(this.dataArray[2]);
-        console.log('Received Vacation Id: ' + this.receivedVacationId);
-      }
+    // Retrieving the Real excursion Id from the vacation details page
+    this.commService.currentData$.subscribe((data) => {
+      console.log("The real Excursion Id: " + data);
+      this.receivedExcursionId = data;
     });
 
-    // Retrieving the selected excursion and showing it's details
-    this.excursionService.retrieve().subscribe((data) => {
+    // Retrieving the Real account Id from the vacation details page
+    this.commService.currentData2$.subscribe((data) => {
+      console.log("The real Account Id: " + data);
+      this.receivedAccountId = data;
+    });
+
+    // Retrieving the Real vacation Id from the vacation details page
+    this.commService.currentData3$.subscribe((data) => {
+      console.log("The real Vacation Id: " + data);
+      this.receivedVacationId = data;
+    });
+
+    // Get the Vacation that holds the Excursion from Firebase.
+    this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
+      data.forEach((item) => {
+        if (item.id == this.receivedVacationId) {
+          console.log("Current vacation: ");
+          console.log(item);
+          this.currentVacation = item;
+        }
+      });
+    });
+
+    // Get the Excursion details from Firestore.
+    this.excursionService.retrieveExcursions(this.receivedAccountId).then((data) => {
       console.log(data);
 
-      // If the excursion exists, get and show it's details 
-      if (this.receivedExcursionId != undefined && this.receivedExcursionId > 0) {
-        if (data._embedded == undefined) {
-          // this.ExcurTitle = data.title + ' Details:';
-          // this.excursion.accountId = data.accountId;
-          // this.excursion.vacationId = data.vacationId;
-          // this.excursion.excursion_title = data.title;
-          // this.excursion.start_date = data.startDate;
-          // this.excursion.description = data.description;
-
-          this.ExcurTitle = data.title + ' Details:';
-          this.chosenExcursion.account_id = data.account_id;
-          this.chosenExcursion.vacation_id = data.vacation_id;
-          this.chosenExcursion.title = data.title;
-          this.chosenExcursion.start_date = data.startDate;
-          this.chosenExcursion.description = data.description;
-        } else {
-          for (let excursion of data._embedded.excursions) {
-            if (excursion.id == this.receivedExcursionId) {
-              // this.ExcurTitle = excursion.title + ' Details:';
-              // this.excursion.accountId = excursion.accountId;
-              // this.excursion.vacationId = excursion.vacationId;
-              // this.excursion.excursion_title = excursion.title;
-              // this.excursion.start_date = excursion.startDate;
-              // this.excursion.description = excursion.description;
-
-              this.ExcurTitle = excursion.title + ' Details:';
-              this.chosenExcursion.account_id = excursion.accountId;
-              this.chosenExcursion.vacation_id = excursion.vacationId;
-              this.chosenExcursion.title = excursion.title;
-              this.chosenExcursion.start_date = excursion.startDate;
-              this.chosenExcursion.description = excursion.description;
-              break;
-            }
-          }
+      // If the Excursion exists, get it's details as placeholders.
+      data.forEach((item) => {
+        if (this.receivedExcursionId != -1 && this.receivedExcursionId != undefined && this.receivedExcursionId == item.id){
+          this.checkExcursion = true;
+          this.ExcurTitle = item.title + ' Details:';
+          this.chosenExcursion.id = item.id;
+          this.chosenExcursion.account_id = item.account_id;
+          this.chosenExcursion.vacation_id = item.vacation_id;
+          this.chosenExcursion.title = item.title;
+          this.chosenExcursion.start_date = item.start_date;
+          this.chosenExcursion.description = item.description;
         }
+      });
 
-      // If the excursion doesn't exist, set up placeholder values
-      } else {
-        this.chosenExcursion.account_id = -1;
-        this.chosenExcursion.vacation_id = -1;
+      // If the Excursion doesn't exist, set up placeholder values.
+      if (!this.checkExcursion) {
+        this.chosenExcursion.account_id = this.receivedAccountId;
+        this.chosenExcursion.vacation_id = this.receivedVacationId;
         this.chosenExcursion.title = 'Excur1';
         this.chosenExcursion.start_date = '2026-05-05';
         this.chosenExcursion.description = 'A short description about the excursion.';
       }
     });
 
-    // Find the vacation that holds the excursion.
-    this.vacationService.retrieve().subscribe((data) => {
-      console.log(data);
-
-      if (data._embedded == undefined) {
-        this.currentVacation = data;
-      } else {
-        for (let vacation of data._embedded.vacations) {
-          if (vacation.id == this.receivedVacationId) {
-            this.currentVacation = vacation;
-            console.log(this.currentVacation.start_date);
-            console.log(this.currentVacation.end_date);
-          }
-        }
-      }
-    });
   }
 
   // Going back to the vacation details page.
@@ -150,7 +126,9 @@ export class ExcursionDetails implements OnInit {
     alert('Let\'s see the big picture of this vacation plan.');
     console.log('Sending back this Account id: ' + this.receivedAccountId);
     console.log('Sending back this vacation id: ' + this.receivedVacationId);
-    this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+    this.commService.transmitData(this.receivedAccountId);
+    this.commService.transmitData2(this.receivedVacationId);
+    // this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
     this.router.navigate(['/vacation-details']);
   }
 
@@ -231,7 +209,6 @@ export class ExcursionDetails implements OnInit {
     //   return;
     // }
 
-    // TODO: find out Why this code block is skipped
     // Check if the excursion start date is within the vacation date range
     if (this.chosenExcursion.start_date != undefined && this.currentVacation.start_date != undefined 
       && this.currentVacation.end_date != undefined) {
@@ -275,26 +252,52 @@ export class ExcursionDetails implements OnInit {
     }
     
     // If the excursion is new, save it to the database
+    // TODO: Make sure the Account, and Vacation IDs are not changed back to "-1" when they get to this point.
     if (this.receivedExcursionId != undefined && this.receivedExcursionId < 0){
-      this.excursionService.createExcursion(this.receivedAccountId, this.receivedVacationId, this.chosenExcursion.title, 
+      const result = this.excursionService.createExcursion(this.receivedAccountId, this.receivedVacationId, this.chosenExcursion.title, 
       this.chosenExcursion.start_date, this.chosenExcursion.description);
-      console.log('Congratulations! You just created an excursion plan!');
-      alert('Congratulations! You just created an excursion plan!');
-      this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
-      this.router.navigate(['/vacation-details']);
+
+      if (this.result != undefined && this.result != Error) {
+        console.log('Congratulations! You just created an excursion plan!');
+        alert('Congratulations! You just created an excursion plan!');
+        this.commService.transmitData(this.receivedAccountId);
+        console.log("Transferring accountId: " + this.receivedAccountId);
+        this.commService.transmitData2(this.receivedVacationId);
+        console.log("Transferring vacationId: " + this.receivedVacationId);
+        // this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+        this.router.navigate(['/vacation-details']);
+
+      // Catch errors when they occur.
+      } else {
+        console.log('Sorry, there was an unknown error. Please try again later.');
+        alert('Sorry, there was an unknown error. Please try again later.');
+
+        this.chosenExcursion.account_id = -1;
+        this.chosenExcursion.vacation_id = -1;
+        this.chosenExcursion.title = 'Excur1';
+        this.chosenExcursion.start_date = '2026-05-05';
+        this.chosenExcursion.description = 'A short description about the excursion.';
+
+        return;
+      }
+      
     
     // If the excursion already exists, update it in the database
     } else {
-      this.result = this.excursionService.updateExcursion(this.receivedExcursionId, this.chosenExcursion.title, this.chosenExcursion.start_date,
+      this.result = this.excursionService.editExcursion(this.receivedExcursionId, this.receivedAccountId, this.chosenExcursion.title, this.chosenExcursion.start_date,
         this.chosenExcursion.description);
-      if (this.result != undefined && this.result != Error){
+      if (this.result != undefined && this.result != Error && this.result != -1){
         console.log('Congratulations! You\'ve successfully updated your excursion plan!');
         alert('Congratulations! You\'ve successfully updated your excursion plan!');
-        this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+        this.commService.transmitData(this.receivedAccountId);
+        this.commService.transmitData2(this.receivedVacationId);
+        // this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
         this.router.navigate(['/vacation-details']);
+      
+      // Catch errors when they occur.
       } else {
-        console.log('Sorry, there was an error. Because the vacation for this excursion doesn\'t exist!');
-        alert('Sorry, there was an error. Because the vacation for this excursion doesn\'t exist!');
+        console.log('Sorry, there was an error. Rebuild your excursion later.');
+        alert('Sorry, there was an error. Rebuild your excursion later.');
 
         this.chosenExcursion.account_id = -1;
         this.chosenExcursion.vacation_id = -1;
@@ -317,11 +320,27 @@ export class ExcursionDetails implements OnInit {
 
     // If the Excursion does exist, remove it from the database.
     } else {
-      this.excursionService.deleteExcursion(this.receivedExcursionId);
-      console.log('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
-      alert('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
-      this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
-      this.router.navigate(['/vacation-details']);
+      this.result = undefined;
+      this.result = this.excursionService.removeExcursion(this.receivedExcursionId);
+      if (this.result != undefined && this.result != -1) {
+        console.log('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
+        alert('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
+        this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+        this.router.navigate(['/vacation-details']);
+      
+      // Catch errors when they appear.
+      } else {
+        console.log('Sorry, there was an error. Rebuild your excursion later.');
+        alert('Sorry, there was an error. Rebuild your excursion later.');
+        
+        this.chosenExcursion.account_id = -1;
+        this.chosenExcursion.vacation_id = -1;
+        this.chosenExcursion.title = 'Excur1';
+        this.chosenExcursion.start_date = '2026-05-05';
+        this.chosenExcursion.description = 'A short description about the excursion.';
+
+        return;
+      }
     }
   }
 }

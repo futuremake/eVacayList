@@ -37,6 +37,8 @@ export class NewPassword implements OnInit {
 
   isAccountFound: boolean = false;
 
+  result: any = undefined;
+
   // The imported services
   constructor(private accountService: AccountService, private router: Router) { }
 
@@ -53,6 +55,16 @@ export class NewPassword implements OnInit {
           this.accounts.push(account);
         }
       }
+    });
+
+
+    // Get the accounts from the Firestore database
+    this.accountService.retrieveAccounts().then(data => {
+      console.log(data);
+      data.forEach(item =>{
+        console.log(item);
+        this.accounts.push(item);
+      });
     });
 
   }
@@ -86,17 +98,28 @@ export class NewPassword implements OnInit {
         console.log('We found your account Id! it is: ' + this.foundAccountId);
         this.isAccountFound = true;
         break;
+      } else {
+        console.log('We can\'t find your account!');
       }
-      console.log('We can\'t find your account!');
     }
 
     // If the account exists, change the password.
     if (this.isAccountFound) {
-      this.accountService.updateAccount(this.foundAccountId, this.currentAccount.username, this.currentAccount.email,
+      
+      this.result = this.accountService.editAccount(this.foundAccountId, this.currentAccount.username, this.currentAccount.email,
         this.currentAccount.password, this.currentAccount.passcode);
-      console.log('Your password was successfully changed. Now you can plan your Vacay!');
-      alert('Your password was successfully changed. Now you can plan your Vacay!');
-      this.router.navigate(['/log-in']);
+
+      // If all goes well, let the user know.
+      if (this.result != undefined && this.result != -1) {  
+        console.log('Your password was successfully changed. Now you can plan your Vacay!');
+        alert('Your password was successfully changed. Now you can plan your Vacay!');
+        this.router.navigate(['/log-in']);
+        
+      // Catch all errors that occur.
+      } else {
+        console.log('Sorry, We\'ve had some problems with changing your password. Please try again later.');
+        alert('Sorry, We\'ve had some problems with changing your password. Please try again later.');
+      }
 
     // If the account does not exist, don't do anything.
     } else {

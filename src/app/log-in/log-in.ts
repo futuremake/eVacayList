@@ -48,20 +48,42 @@ export class LogIn {
 
   accountId: number|undefined = -1;
 
+  // rawAccounts: Promise<Account[]> | undefined | never[] = [];
+  rawAccounts: any;
+
+  holderAccount: Account = new Account();
+
+  processedAccounts: any;
+
   // The Imported Services
   constructor(private accountService: AccountService, private router: Router, private commService: CommunicationService) { }
 
   ngOnInit(): void {
 
-    // Retrieving the accounts
-    this.accountService.retrieve().subscribe((data) => {
-        console.log(data);
-        if (data._embedded == undefined) {
-          this.accounts.push(data);
-        } else {
-          this.accounts = data._embedded.accounts;
-        }
+    // // Retrieving the accounts
+    // this.accountService.retrieve().subscribe((data) => {
+    //     console.log(data);
+    //     if (data._embedded == undefined) {
+    //       this.accounts.push(data);
+    //     } else {
+    //       this.accounts = data._embedded.accounts;
+    //     }
+    //   });
+
+    // Retrieving the Firestore Accounts
+    this.rawAccounts = this.accountService.retrieveAccounts().then(data => {
+      console.log(data);
+      data.forEach(item =>{
+        console.log(item);
+        this.accounts.push(item);
       });
+    });
+
+    console.log("The raw account data: ");
+    console.log(this.rawAccounts);
+
+    console.log("The Main Account Data: ")
+    console.log(this.accounts);
   }
 
   // Logging in to the app 

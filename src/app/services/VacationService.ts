@@ -2,7 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Vacation } from '../models/vacation.model';
 import { DocumentReference, DocumentData, Firestore, query, collectionData } from '@angular/fire/firestore';
-import { addDoc, collection, orderBy } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 
 type CurrentVacation = {
   id: number | undefined;
@@ -13,6 +14,21 @@ type CurrentVacation = {
   end_date: string | undefined;
   description: string | undefined;
 }
+
+const firebaseConfig = {
+        apiKey: "AIzaSyBY46CRU09sgwBGX75jfZOQhVzVoz3eMxQ",
+        authDomain: "evacaylist.firebaseapp.com",
+        projectId: "evacaylist",
+        storageBucket: "evacaylist.firebasestorage.app",
+        messagingSenderId: "46775024805",
+        appId: "1:46775024805:web:a633f37ebf25fe87bb614c",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize FireStore and get a reference to the service
+const db = getFirestore(app);
 
 @Injectable({
   providedIn: 'root',
@@ -72,51 +88,54 @@ export class VacationService {
   baseUrl: string = "http://localhost:8080/api/vacations"
 
   // The Variables
-  firestore: Firestore = inject(Firestore);
+  // firestore: Firestore = inject(Firestore);
+
+  foundVacation: Vacation = new Vacation();
+  vacationsArray: Vacation[] = [];
   
   // The imported service
   constructor(private http: HttpClient) { }
 
-  // Create a vacation on the Api
-  public async createVacation(accountId: number | undefined, title: string | undefined, lodging: string | undefined, 
-    startDate: string | undefined, endDate: string | undefined, description: string | undefined) {
+  // // Create a vacation on the Api
+  // public async createVacation(accountId: number | undefined, title: string | undefined, lodging: string | undefined, 
+  //   startDate: string | undefined, endDate: string | undefined, description: string | undefined) {
 
-    try {
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        body: JSON.stringify({
-          account_id: accountId,
-          title: title,
-          lodging: lodging,
-          start_date: startDate,
-          end_date: endDate,
-          description: description
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-      });
+  //   try {
+  //     const response = await fetch(this.baseUrl, {
+  //       method: 'POST',
+  //       body: JSON.stringify({
+  //         account_id: accountId,
+  //         title: title,
+  //         lodging: lodging,
+  //         start_date: startDate,
+  //         end_date: endDate,
+  //         description: description
+  //       }),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Accept: 'application/json'
+  //       },
+  //     });
 
-      if(!response.ok) {
-        throw new Error(`Error! Status: ${ response.status }`);
-      }
+  //     if(!response.ok) {
+  //       throw new Error(`Error! Status: ${ response.status }`);
+  //     }
 
-      const result = (await response.json()) as Vacation;
-      console.log('Result is: ', JSON.stringify(result, null, 4));
-      return result;
+  //     const result = (await response.json()) as Vacation;
+  //     console.log('Result is: ', JSON.stringify(result, null, 4));
+  //     return result;
 
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        console.log('Error message: ', error.message);
-        return error.message;
-      } else {
-        console.log('Unexpected error: ', error );
-        return 'An unexpected error has occurred.';
-      }
-    }
-  }
+  //   }
+  //   catch (error) {
+  //     if (error instanceof Error) {
+  //       console.log('Error message: ', error.message);
+  //       return error.message;
+  //     } else {
+  //       console.log('Unexpected error: ', error );
+  //       return 'An unexpected error has occurred.';
+  //     }
+  //   }
+  // }
 
   // // Create a Vacation on the Firebase Database
   // createVacation = async(newAccountId: number | undefined, newTitle: string | undefined, newLodging: string | undefined, 
@@ -251,5 +270,115 @@ export class VacationService {
         return 'An unexpected error has occurred';
       }
     }
+  }
+
+  // Create a Vacation in the Firebase Database
+  public async createVacation(newAccountId: number | undefined, newTitle: string | undefined, newLodging: string | undefined, 
+    newStartDate: string | undefined, newEndDate: string | undefined, newDescription: string | undefined) {
+      
+      try {
+        const vacationRef = await addDoc(collection(db, 'vacations'), {
+          account_id: newAccountId,
+          title: newTitle,
+          lodging: newLodging,
+          start_date: newStartDate,
+          end_date: newEndDate,
+          description: newDescription
+        });
+
+        await updateDoc(vacationRef, {
+          id: vacationRef.id
+        });
+
+        console.log("Document created with id: " + vacationRef.id);
+        return vacationRef.id;
+
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+      }
+
+    }
+
+  // Retrieve all vacations in the Firebase Database
+  public async retrieveVacations(accountId: number | undefined) {
+
+    const vacayRef = collection(db, "vacations");
+    const q = query(vacayRef, where("id", "==", accountId));
+    const querySnapshot = await getDocs(q);
+
+    this.vacationsArray = [];
+
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id + " => ");
+      console.log(doc.data());
+      this.foundVacation.id = doc.data()['id'];
+      this.foundVacation.account_id = doc.data()['account_id'];
+      this.foundVacation.title = doc.data()['title'];
+      this.foundVacation.lodging = doc.data()['lodging'];
+      this.foundVacation.start_date = doc.data()['start_date'];
+      this.foundVacation.end_date = doc.data()['end_date'];
+      this.foundVacation.description = doc.data()['description'];
+
+      this.vacationsArray.push(this.foundVacation);
+      this.foundVacation = new Vacation();
+    });
+    
+    return this.vacationsArray; 
+  }
+
+  // Update a Vacation in the FireBase Database
+  public async editVacation(vacationId: number | undefined, accountId: number | undefined, editTitle: string | undefined, 
+    editLodging: string | undefined, editStartDate: string | undefined, editEndDate: string | undefined, 
+    editDescription: string | undefined) {
+      
+    if (vacationId != undefined) {
+      const editRef = doc(db, "vacations", vacationId.toString());
+      const e = await updateDoc(editRef, {
+        id: vacationId,
+        account_id: accountId,
+        title: editTitle,
+        lodging: editLodging,
+        start_date: editStartDate,
+        end_date: editEndDate,
+        description: editDescription
+      });
+
+      return e;
+    }
+
+    return -1;
+  }
+
+
+  // Delete a Vacation in the Firebase Database
+  public async removeVacation(vacationId: number | undefined) {
+
+    try {
+      if (vacationId != undefined) {
+        const removeRef = doc(db, "vacation", vacationId.toString());
+        
+        console.log("The stringified vacationId to use for vacation deletion: " + vacationId.toString());
+
+        const r = await deleteDoc(removeRef);
+
+        return r;
+      }
+    } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+    }
+
+    return -1;
   }
 }
