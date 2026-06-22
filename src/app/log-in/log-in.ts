@@ -73,10 +73,16 @@ export class LogIn {
     // Retrieving the Firestore Accounts
     this.rawAccounts = this.accountService.retrieveAccounts().then(data => {
       console.log(data);
-      data.forEach(item =>{
-        console.log(item);
-        this.accounts.push(item);
-      });
+      if (data instanceof String) {
+        console.log("An Error has occurred");
+      }
+
+      if (data instanceof Array) {
+        data.forEach((item: any) =>{
+          console.log(item);
+          this.accounts.push(item);
+        });
+      }
     });
 
     console.log("The raw account data: ");

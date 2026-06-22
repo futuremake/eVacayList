@@ -382,32 +382,42 @@ constructor(private http: HttpClient) { }
     // const r = query(docRef4, where("username", "==", "FloatingSponge"));
     // console.log("Query test 2 result: " + r);
 
-    const q = query(collection(db, 'accounts'));
-    const querySnapshot = await getDocs(q);
+    try {
+      const q = query(collection(db, 'accounts'));
+      const querySnapshot = await getDocs(q);
 
-    // Query Snapshot Tests
-    this.foundAccount = new Account();
-    this.foundAccount.id = undefined;
-    this.accountsArray = [];
-    
-    querySnapshot.forEach(doc => {
-      console.log(doc.id + " => ");
-      console.log(doc.data());
-      // console.log(doc.data()['email']);
-      this.foundAccount.id = doc.data()['id'];
-      this.foundAccount.email = doc.data()['email'];
-      this.foundAccount.username = doc.data()['username'];
-      this.foundAccount.password = doc.data()['password'];
-      this.foundAccount.passcode = doc.data()['passcode'];
-
-      this.accountsArray.push(this.foundAccount);
+      // Query Snapshot Tests
       this.foundAccount = new Account();
-    });
+      this.foundAccount.id = undefined;
+      this.accountsArray = [];
+      
+      querySnapshot.forEach(doc => {
+        console.log(doc.id + " => ");
+        console.log(doc.data());
+        // console.log(doc.data()['email']);
+        this.foundAccount.id = doc.data()['id'];
+        this.foundAccount.email = doc.data()['email'];
+        this.foundAccount.username = doc.data()['username'];
+        this.foundAccount.password = doc.data()['password'];
+        this.foundAccount.passcode = doc.data()['passcode'];
 
-    
+        this.accountsArray.push(this.foundAccount);
+        this.foundAccount = new Account();
+      });
 
-    // return querySnapshot;
-    return this.accountsArray;
+      // return querySnapshot;
+      return this.accountsArray;
+    } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+    }
+
+    // return -1;
   }
 
   public async retrieveAccount(accountId: number | undefined) {

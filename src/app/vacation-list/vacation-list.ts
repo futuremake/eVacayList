@@ -55,13 +55,21 @@ export class VacationList implements OnInit{
 
     // Retrieving the account from Firebase
     this.accountService.retrieveAccounts().then((data) => {
-      data.forEach(item => {
-        if (item.id == this.receivedAccountId){
-          this.title = item.username + '\'s List:';
-          console.log(this.title); 
-          return;
-        }
-      });
+      
+      console.log(data);
+      if (data instanceof String) {
+        console.log("An Error has occurred.");
+      }
+      
+      if (data instanceof Array) {
+        data.forEach(item => {
+          if (item.id == this.receivedAccountId){
+            this.title = item.username + '\'s List:';
+            console.log(this.title); 
+            return;
+          }
+        });
+      }
     });
 
     // Getting the user's vacation plans from Firebase

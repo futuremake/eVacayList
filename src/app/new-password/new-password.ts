@@ -61,10 +61,17 @@ export class NewPassword implements OnInit {
     // Get the accounts from the Firestore database
     this.accountService.retrieveAccounts().then(data => {
       console.log(data);
-      data.forEach(item =>{
-        console.log(item);
-        this.accounts.push(item);
-      });
+
+      if (data instanceof String) {
+        console.log("An Error has occurred.");
+      }
+
+      if (data instanceof Array) {
+        data.forEach(item =>{
+          console.log(item);
+          this.accounts.push(item);
+        });
+      }
     });
 
   }

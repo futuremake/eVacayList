@@ -92,16 +92,23 @@ export class Profile implements OnInit {
     // Retrieving the account from Firestore and showing its details
     this.accountService.retrieveAccounts().then((data) => {
       console.log("Data recieved: " + data);
-      data.forEach(item => {
-        if (item.id == this.receivedAccountId) {
-          console.log("Account found: " + item);
-          this.currentAccount.id = item.id;
-          this.currentAccount.email = item.email;
-          this.currentAccount.username = item.username;
-          this.currentAccount.password = item.password;
-          this.currentAccount.passcode = item.passcode;
-        }
-      });
+
+      if (data instanceof String) {
+        console.log("An Error has occurred");
+      }
+
+      if (data instanceof Array) {
+        data.forEach(item => {
+          if (item.id == this.receivedAccountId) {
+            console.log("Account found: " + item);
+            this.currentAccount.id = item.id;
+            this.currentAccount.email = item.email;
+            this.currentAccount.username = item.username;
+            this.currentAccount.password = item.password;
+            this.currentAccount.passcode = item.passcode;
+          }
+        });
+      }
     });
 
     // // Checking if this account has any vacations in it
