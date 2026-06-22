@@ -1,7 +1,8 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 // import { provideAuth0 } from '@auth0/auth0-angular';
-// import { environment } from '../environments/environments';
+import { environment } from '../environments/environments';
+import { USE_EMULATOR as USE_FIRESTORE_EMULATOR  } from '@angular/fire/compat/firestore'
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     //   }
     // }),
     // provideBrowserGlobalErrorListeners()
+    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['http://localhost:8080'] : undefined },
   ]
 
 };
