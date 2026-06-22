@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     //   }
     // }),
     // provideBrowserGlobalErrorListeners()
-    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['http://localhost:8080'] : undefined },
+    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['http://localhost:8080'] : ['http://localhost:8080'] },
   ]
 
 };

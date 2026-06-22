@@ -15,7 +15,7 @@ export const environment = {
         messagingSenderId: "46775024805",
         appId: "1:46775024805:web:a633f37ebf25fe87bb614c",
     },
-    BASE_URL: 'http://evacaylist.firebasestorage.app:8080',
-    BASE_URL2: 'http://evacaylist.firebasestorage.app:8080',
+    BASE_URL: 'http://localhost:8080',
+    BASE_URL2: 'http://localhost:8080',
     useEmulators: true
 }
