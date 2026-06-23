@@ -20,13 +20,17 @@ export class VacationList implements OnInit{
   // The Variables
   title: String | undefined = 'Username\'s List:';
 
-  vacations: Vacation[] = [];
-
   receivedAccountId: number | undefined = -1;
 
   chosenVacationId: number | undefined = -1;
 
-  accounts: Account[] = [];
+  rawAccounts: any;
+
+  // accounts: Account[] = [];
+
+  rawVacations: any;
+
+  vacations: Vacation[] = [];
 
   // selectedVacation: Vacation = new Vacation();
   
@@ -54,7 +58,9 @@ export class VacationList implements OnInit{
     });
 
     // Retrieving the account from Firebase
-    this.accountService.retrieveAccounts().then((data) => {
+    this.rawAccounts = this.accountService.retrieveAccounts();
+    
+    this.rawAccounts.then((data: any) => {
       
       console.log(data);
       if (data instanceof String) {
@@ -73,9 +79,11 @@ export class VacationList implements OnInit{
     });
 
     // Getting the user's vacation plans from Firebase
-    this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
+    this.rawAccounts = this.vacationService.retrieveVacations(this.receivedAccountId)
+    this.rawAccounts.then((data: any) => {
       console.log(data);
-      data.forEach(item => {
+      console.log("Vacations for this user: ");
+      data.forEach((item: any) => {
         if (item.account_id == this.receivedAccountId){
           console.log(item);
           this.vacations.push(item);
@@ -92,7 +100,6 @@ export class VacationList implements OnInit{
     alert('Show me the vacay details!');
     this.commService.transmitData(this.receivedAccountId);
     this.commService.transmitData2(this.chosenVacationId);
-    // this.commService.transmitDataString(this.receivedAccountId + ',' + this.chosenVacationId);
     this.router.navigate(['/vacation-details']);
   }
 
@@ -120,7 +127,6 @@ export class VacationList implements OnInit{
       console.log("Transferring AccountId: " + this.receivedAccountId);
       this.commService.transmitData2(this.chosenVacationId);
       console.log("Transferring VacationId: " + this.chosenVacationId);
-      // this.commService.transmitDataString( this.receivedAccountId + ',' + this.chosenVacationId);
       this.router.navigate(['/vacation-details']);
 
     // If the account does not exist, don't do anything.
@@ -141,28 +147,11 @@ export class VacationList implements OnInit{
       console.log('Searching for Vacations with this title: ' + this.processedValue);
       this.vacations = [];
 
-      // this.vacationService.retrieve().subscribe((data) => {
-      //   console.log(data);
-
-      //   // Only one vacation? If it has the input value, Add it.
-      //   if (data._embedded == undefined && data.title.includes(this.processedValue)) {
-      //     this.vacations.push(data);
-        
-      //   // More than one vacation? Only add the user's vacations if they contain the search value.
-      //   } else {
-      //     for (let vacation of data._embedded.vacations) {
-      //       if (vacation.account_id == this.receivedAccountId && vacation.title.includes(this.processedValue)) {
-      //         this.vacations.push(vacation);
-      //       }
-      //     } 
-      //   }
-      // });
-
       // Searching for vacations using Firestore
-      this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
-
-        console.log("Vacation Data to search through: " + data);
-        data.forEach(item => {
+      const searchVacations = this.vacationService.retrieveVacations(this.receivedAccountId)
+      searchVacations.then((data) => {
+        console.log("Vacation Data to search through: "); 
+        data.forEach((item: any) => {
           if (item.account_id == this.receivedAccountId && item.title != undefined && item.title.includes(this.processedValue)) {
             console.log("Adding Item: " + item);
             this.vacations.push(item);
@@ -170,7 +159,7 @@ export class VacationList implements OnInit{
         });
       });
     
-    // If the account exists, search for the account's vacations by title.
+    // If the account does not exist, don't do anything.
     } else {
       console.log('We can\'t help you search for a vacation for an account that doesn\'t exist!');
       alert('We can\'t help you search for a vacation for an account that doesn\'t exist!');

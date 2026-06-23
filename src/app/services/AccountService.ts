@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Account } from '../models/account.model';
-import { DocumentReference, DocumentData, Firestore, collectionData, query } from '@angular/fire/firestore';
-import { addDoc, updateDoc, collection, orderBy, getDocs, where, deleteDoc } from 'firebase/firestore';
+// import { DocumentReference, DocumentData, Firestore, collectionData } from '@angular/fire/firestore';
+import { addDoc, updateDoc, collection, orderBy, getDocs, where, deleteDoc, query, onSnapshot } from 'firebase/firestore';
 import { timestamp } from 'rxjs';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
@@ -60,19 +60,6 @@ export class AccountService {
   //   passcode: '4545454'
   // }]
 
-  // constructor() { }
-
-  // public getAccounts(): any {
-  //   const accountsObservable = new Observable(observer => {
-  //     setTimeout(() => {
-  //       observer.next(this.accounts);
-  //     }, 10000);
-  //   })
-
-  //   return accountsObservable;
-  // }
-
-
   // New Version
 
 // The imported service
@@ -87,106 +74,10 @@ constructor(private http: HttpClient) { }
   accountsArray: Account[] = [];
   foundAccount: Account = new Account(); 
 
-  // // Create an Account on the Api
-  // public async createAccount(username: string | undefined, email: string | undefined, password: string | undefined, passcode: string | undefined) {
-  //   try {
-  //     const response = await fetch( this.baseUrl, {
-  //       method: 'POST',
-  //       body: JSON.stringify ({
-  //         username: username,
-  //         email: email,
-  //         password: password,
-  //         passcode: passcode
-  //       }),
-
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Accept: 'application/json'
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`Error! Status: ${response.status}`);
-  //     }
-
-  //     const result = (await response.json()) as Account;
-  //     console.log('Result is: ', JSON.stringify(result, null, 4));
-  //     return result;
-  //   }
-  //   catch (error) {
-  //     if (error instanceof Error) {
-  //       console.log('Error message: ', error.message);
-  //       return error.message;
-  //     } else {
-  //       console.log('Unexpected Error: ', error);
-  //       return 'An unexpected error occurred.'
-  //     }
-  //   }
-  // }
-
-  // // Create an Account on Cloud Firestore.
-  // createAccount = async (newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, newPasscode: string | undefined):
-  // Promise<void | DocumentReference<DocumentData>> => {
-
-  //   // Can't make an account with missing values
-  //   if (!newUsername || !newEmail || !newPassword || !newPasscode) {
-  //     console.log('We can\'t add an account with missing values.\n ' 
-  //       + newUsername + '\n' 
-  //       + newEmail + '\n' 
-  //       + newPassword + '\n' 
-  //       + newPasscode);
-
-  //     return;
-  //   }
-
-  //   const futureAccount: CurrentAccount = {
-  //     id: undefined,
-  //     username: newUsername,
-  //     email: newEmail,
-  //     password: newPassword,
-  //     passcode: newPasscode,
-  //   };
-
-  //   futureAccount.id = undefined
-  //   newUsername && (futureAccount.username = newUsername);
-  //   newEmail && (futureAccount.email = newEmail);
-  //   newPassword && (futureAccount.password = newPassword);
-  //   newPasscode && (futureAccount.passcode = newPasscode);
-
-  //   console.log('New Account Data:\n' 
-  //       + newUsername + '\n' 
-  //       + newEmail + '\n' 
-  //       + newPassword + '\n' 
-  //       + newPasscode);
-    
-  //   // Make and save the Account
-  //   try {
-  //     const newAccountRef = await addDoc(
-  //       collection(this.firestore, "accounts"),
-  //       futureAccount,
-  //     );
-  //     console.log(newAccountRef);
-
-  //     return newAccountRef;
-  //   } catch (error) {
-  //     console.error('Error writing new account to Firebase Database: ' + error);
-  //     return;
-  //   }
-  // }
-
-
   // Get all the accounts from the Api
   public retrieve() {
     return this.http.get<any>(this.baseUrl, { });
   }
-
-  // Get all the accounts from the Firebase database
-  // retrieve = () => {
-  //   // Create the query to load all the accounts and listen for new ones.
-  //   const accountsQuery = query(collection(this.firestore, 'accounts'), orderBy('timestamp', 'desc'));
-  //   // Start listening to the query.
-  //   return collectionData(accountsQuery);
-  // }
 
   // Update an Account on the Api
   async updateAccount(accountId: number | undefined, username: string | undefined, email: string | undefined, password: string | undefined, 
@@ -225,52 +116,6 @@ constructor(private http: HttpClient) { }
       }
     }
   }
-
-  // // Update an Account on the Firebase Database
-  // updateAccount = async(newUsername: string | undefined, newEmail: string | undefined, newPassword: string | undefined, 
-  //   newPasscode: string | undefined):
-  //   Promise<void | DocumentReference<DocumentData>> => {
-
-  //     //TODO: Can't update an Account that doesn't exist
-
-
-
-  //     // Can't update an Account with missing values
-  //     if (!newUsername || !newEmail || !newPassword || !newPasscode) {
-  //       console.log('We can\'t update an account with missing values.\n ' 
-  //       + newUsername + '\n' 
-  //       + newEmail + '\n' 
-  //       + newPassword + '\n' 
-  //       + newPasscode);
-
-  //       return;
-  //     }
-
-  //     const updateAccount: CurrentAccount = {
-  //       id: undefined,
-  //       username: newUsername,
-  //       email: newEmail,
-  //       password: newPassword,
-  //       passcode: newPasscode
-  //     };
-
-  //     updateAccount.id = undefined;
-  //     newUsername && (updateAccount.username = newUsername);
-  //     newEmail && (updateAccount.email = newEmail);
-  //     newPassword && (updateAccount.password = newPassword);
-  //     newPasscode && (updateAccount.passcode = newPasscode);
-
-  //     // Update the Account and save the update in the Firebase Database
-  //     try {
-  //       // const newAccountRef = await updateDoc(
-  //       //   collection(this.firestore, "accounts"),
-  //       //   updateAccount,
-  //       // );
-  //     } catch {
-
-  //     }
-
-  //   }
 
   // Delete an Account on the Api
   async deleteAccount(accountId: number | undefined) {
@@ -338,50 +183,6 @@ constructor(private http: HttpClient) { }
   // Get all the accounts from the Firestore Database
   public async retrieveAccounts() { 
 
-    // // Test methods
-    // // Test 1:
-    // const docRef = doc(db, "accounts", "Md3mMvZCTJlhe9FJuwpW");
-    // console.log("Document Reference Test 1: " + docRef);
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   console.log("Test Document Account Data 1: " + docSnap.data() 
-    //   + "Account id: " + docSnap.id
-    //   + docSnap.id);
-    // } else {
-    //   // docSnap.data() will be undefined in this case
-    //   console.log("Sorry, Test Document Account failed this time.");
-    // }
-
-    // // Test 2:
-    // const docRef2 = doc(db, "accounts", "iEWIIf1j28eGjnXXCvKW");
-    // console.log("Document Reference Test 2: " + docRef2);
-    // const docSnap2 = await getDoc(docRef2);
-
-    // if (docSnap2.exists()) {
-    //   console.log("Test Document Account Data 2: " + docSnap2.data() + "Account id: " + docSnap2.id);
-    // } else {
-    //   // docSnap.data() will be undefined in this case
-    //   console.log("Sorry, Test Document Account failed this time.");
-    // }
-
-    // // Test 3:
-    // const docRef3 = doc(db, "accounts", "pmd4Saok0IVk4OGtiMYY");
-    // console.log("Document Reference Test 3: " + docRef3);
-    // const docSnap3 = await getDoc(docRef3);
-
-    // if (docSnap3.exists()) {
-    //   console.log("Test Document Account Data 3: " + docSnap3.data() + "Account id: " + docSnap.id);
-    // } else {
-    //   // docSnap.data() will be undefined in this case
-    //   console.log("Sorry, Test Document Account failed this time.");
-    // }
-
-    // // Query Snapshot tests 2
-    // const docRef4 = collection(db, 'accounts');
-    // const r = query(docRef4, where("username", "==", "FloatingSponge"));
-    // console.log("Query test 2 result: " + r);
-
     try {
       const q = query(collection(db, 'accounts'));
       const querySnapshot = await getDocs(q);
@@ -391,6 +192,7 @@ constructor(private http: HttpClient) { }
       this.foundAccount.id = undefined;
       this.accountsArray = [];
       
+      console.log("Loading Accounts: ");
       querySnapshot.forEach(doc => {
         console.log(doc.id + " => ");
         console.log(doc.data());
@@ -416,8 +218,6 @@ constructor(private http: HttpClient) { }
           return "An Unknown Error has occurred.";
         }
     }
-
-    // return -1;
   }
 
   public async retrieveAccount(accountId: number | undefined) {
@@ -513,5 +313,34 @@ constructor(private http: HttpClient) { }
     }
 
     return -1;
+  }
+
+  // Version 4
+
+  // Get all the accounts from the Firestore Database and listen in on changes
+  public async retrieveAccounts2() { 
+
+    const accountArray: any = [];
+    try {
+      const q = query(collection(db, 'accounts'));
+      const newSubscribe = onSnapshot(q, (querySnapshot) => {
+        
+        querySnapshot.forEach((doc) => {
+          accountArray.push(doc.data());
+        });
+        console.log(accountArray);
+      });
+      
+      return accountArray;
+
+    } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error Message: " + error.message);
+          return error.message;
+        } else {
+          console.log("Unknown error: " + error);
+          return "An Unknown Error has occurred.";
+        }
+    } 
   }
 }

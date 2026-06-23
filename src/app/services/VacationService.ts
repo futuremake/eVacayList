@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Vacation } from '../models/vacation.model';
-import { DocumentReference, DocumentData, Firestore, query, collectionData } from '@angular/fire/firestore';
+import { DocumentReference, DocumentData, Firestore, collectionData, query } from '@angular/fire/firestore';
 import { initializeApp } from 'firebase/app';
 import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 
@@ -190,19 +190,6 @@ export class VacationService {
     return this.http.get<any>( this.baseUrl, { });
   }
 
-  // Retrieve all vacations from the Firebase Database
-  // retrieve = () => {
-  //   // Create the query to load all the vacations and listen for new ones.
-  //   const vacationsQuery = query(collection(this.firestore, "vacations"), orderBy('timestamp', 'desc'));
-  //   // Start listening to the query
-  //   return collectionData(vacationsQuery);
-  // }
-
-  // Retrieve all vacations associated with a specific account
-  // public retrieveAccountVacations(accountId: number | undefined) {
-  //   return this.http.get<any>(this.baseUrl + '/' + accountId, { });
-  // }
-
   // Update a vacation on the Api
   public async updateVacation(vacationId: number | undefined, accountId: number | undefined, title: string | undefined, 
     lodging: string | undefined, startDate: string | undefined, endDate: string | undefined, description: string | undefined) {
@@ -308,28 +295,32 @@ export class VacationService {
   // Retrieve all vacations in the Firebase Database
   public async retrieveVacations(accountId: number | undefined) {
 
-    const vacayRef = collection(db, "vacations");
-    const q = query(vacayRef, where("id", "==", accountId));
-    const querySnapshot = await getDocs(q);
-
-    this.vacationsArray = [];
-
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id + " => ");
-      console.log(doc.data());
-      this.foundVacation.id = doc.data()['id'];
-      this.foundVacation.account_id = doc.data()['account_id'];
-      this.foundVacation.title = doc.data()['title'];
-      this.foundVacation.lodging = doc.data()['lodging'];
-      this.foundVacation.start_date = doc.data()['start_date'];
-      this.foundVacation.end_date = doc.data()['end_date'];
-      this.foundVacation.description = doc.data()['description'];
-
-      this.vacationsArray.push(this.foundVacation);
-      this.foundVacation = new Vacation();
-    });
     
-    return this.vacationsArray; 
+      const vacayRef = collection(db, "vacations");
+      const q = query(vacayRef, where("id", "==", accountId));
+      const querySnapshot = await getDocs(q);
+
+      this.vacationsArray = [];
+
+      console.log("Loading Vacations: ");
+
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id + " => ");
+        console.log(doc.data());
+        this.foundVacation.id = doc.data()['id'];
+        this.foundVacation.account_id = doc.data()['account_id'];
+        this.foundVacation.title = doc.data()['title'];
+        this.foundVacation.lodging = doc.data()['lodging'];
+        this.foundVacation.start_date = doc.data()['start_date'];
+        this.foundVacation.end_date = doc.data()['end_date'];
+        this.foundVacation.description = doc.data()['description'];
+
+        this.vacationsArray.push(this.foundVacation);
+        this.foundVacation = new Vacation();
+      });
+      
+      return this.vacationsArray;
+    
   }
 
   // Update a Vacation in the FireBase Database

@@ -74,49 +74,6 @@ export class ExcursionService {
   // The imported service
   constructor(private http: HttpClient) { }
 
-  // Create an excursion in the Api
-  // public async createExcursion(accountId: number | undefined, vacationId: number | undefined, title: string | undefined, 
-  //   startDate: string | undefined, description: string | undefined) {
-  //   console.log('Excur Service accountId: ' + accountId);
-  //   console.log('Excur Service vacationId: ' + vacationId);
-  //   console.log('Excur Service title: ' + title);
-  //   console.log('Excur Service startDate: ' + startDate);
-  //   console.log('Excur Service description: ' + description);
-  //   try {
-  //     const response = await fetch(this.baseUrl,  {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         accountId: accountId,
-  //         vacationId: vacationId,
-  //         title: title,
-  //         startDate: startDate,
-  //         description: description
-  //       }),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Accept: 'application/json'
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`Error! Status: ${response.status}`);
-  //     }
-
-  //     const result = (await response.json()) as Excursion;
-  //     console.log('Result is: ', JSON.stringify(result, null, 4));
-  //     return result;
-  //   }
-  //   catch (error) {
-  //     if (error instanceof Error) {
-  //       console.log('Error message: ', error.message);
-  //       return error.message;
-  //     } else {
-  //       console.log('Unexpected Error: ', error)
-  //       return 'An unexpected error has occurred.';
-  //     }
-  //   }
-  // }
-
   // // Create an Excursion in the Firebase Database.
   // createExcursion = async(newAccountId: number | undefined, newVacationId: number | undefined, newTitle: string | undefined, 
   //   newStartDate: string | undefined, newDescription: string | undefined):
@@ -166,19 +123,6 @@ export class ExcursionService {
   public retrieve() {
     return this.http.get<any>(this.baseUrl, { });
   }
-
-  // // Retrieve all excursions in the Firebase Database
-  // retrieve = () => {
-  //   // Create the query to load all the excursions and listen for new ones.
-  //   const excursionsQuery = query(collection(this.firestore, 'excursions'), orderBy('timestamp', 'desc'));
-  //   // Start listening to the query
-  //   return collectionData(excursionsQuery);
-  // }
-
-  // // Retrieve information about a vacation's specific excursion
-  // // public retrieveVacationExcursions(excursionId: number | undefined) {
-  // //   return this.http.get<any>(this.baseUrl + '/' + excursionId, { });
-  // // }
 
   // Update a excursion in the Api
   public async updateExcursion(excursionId: number | undefined, title: string | undefined, startDate: string | undefined,
@@ -288,6 +232,7 @@ export class ExcursionService {
 
     this.excursionArray = [];
 
+    console.log("Loading Excursions: ");
     querySnapshot.forEach((doc) => {
       console.log(doc.id + " => " );
       console.log(doc.data());

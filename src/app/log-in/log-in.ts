@@ -5,7 +5,7 @@ import { Account } from '../models/account.model';
 import { Router } from '@angular/router';
 import { CommunicationService } from '../services/CommunicationService';
 import { AsyncPipe } from '@angular/common';
-import { DocumentData } from 'firebase/firestore';
+import { DocumentData, onSnapshot } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 @Component({
   selector: 'app-log-in',
@@ -14,20 +14,6 @@ import { Observable } from 'rxjs';
   styleUrl: './log-in.css',
 })
 export class LogIn {
-  
-  // user = {
-  //   username: '',
-  //   password: ''
-  // };
-
-  // submitted = false;
-
-  // onSubmit() {
-  //   this.submitted = true;
-  //   this.user.username = this.signupForm.value.userData.uname;
-  //   this.user.password = this.signupForm.value.userData.pword;
-  //   this.signupForm.reset();
-  // }
 
   // New Version
 
@@ -48,7 +34,6 @@ export class LogIn {
 
   accountId: number|undefined = -1;
 
-  // rawAccounts: Promise<Account[]> | undefined | never[] = [];
   rawAccounts: any;
 
   holderAccount: Account = new Account();
@@ -59,37 +44,51 @@ export class LogIn {
   constructor(private accountService: AccountService, private router: Router, private commService: CommunicationService) { }
 
   ngOnInit(): void {
+    // // Retrieving the Firestore Accounts
+    // this.rawAccounts = this.accountService.retrieveAccounts().then(data => {
+    //   console.log(data);
+    //   if (data instanceof String) {
+    //     console.log("An Error has occurred");
+    //   }
 
-    // // Retrieving the accounts
-    // this.accountService.retrieve().subscribe((data) => {
-    //     console.log(data);
-    //     if (data._embedded == undefined) {
-    //       this.accounts.push(data);
-    //     } else {
-    //       this.accounts = data._embedded.accounts;
-    //     }
-    //   });
+    //   if (data instanceof Array) {
+    //     data.forEach((item: any) =>{
+    //       console.log(item);
+    //       this.accounts.push(item);
+    //     });
+    //   }
+    // });
 
-    // Retrieving the Firestore Accounts
-    this.rawAccounts = this.accountService.retrieveAccounts().then(data => {
-      console.log(data);
-      if (data instanceof String) {
-        console.log("An Error has occurred");
-      }
+    // Retrieving the Firestore Accounts part 2
+    this.rawAccounts = this.accountService.retrieveAccounts();
 
-      if (data instanceof Array) {
-        data.forEach((item: any) =>{
-          console.log(item);
-          this.accounts.push(item);
-        });
-      }
-    });
-
-    console.log("The raw account data: ");
+    console.log("The raw account Data: ");
     console.log(this.rawAccounts);
 
-    console.log("The Main Account Data: ")
-    console.log(this.accounts);
+    this.rawAccounts.then((data: any) => {
+
+      console.log("The raw account values: ");
+      console.log(data);
+
+      for (const item of data) {
+        // console.log("Item to put into accounts: ");
+        // console.log(item);
+        this.holderAccount.email = item.email;
+        this.holderAccount.id = item.id;
+        this.holderAccount.username = item.username;
+        this.holderAccount.password = item.password;
+        this.holderAccount.passcode = item.passcode;
+        
+        this.accounts.push(this.holderAccount);
+        this.holderAccount = new Account();
+      }
+
+      console.log("The Main Account Data: ")
+      console.log(this.accounts);
+    });
+    
+    // console.log("The Main Account Data: ")
+    // console.log(this.accounts);
   }
 
   // Logging in to the app 
@@ -124,10 +123,4 @@ export class LogIn {
       alert("Sorry, we don't have your account. Try again!");
     }
   }
-
-
-  // Version 3
-
-
-
 }
