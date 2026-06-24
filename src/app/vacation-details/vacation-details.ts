@@ -69,6 +69,8 @@ export class VacationDetails implements OnInit {
 
   result: any = undefined;
 
+  resultData: any = undefined;
+
   // The imported services
   constructor(private excursionService: ExcursionService, private commService: CommunicationService,
     private vacationService: VacationService, private router: Router) { }
@@ -311,23 +313,20 @@ export class VacationDetails implements OnInit {
       
       // If the vacation has no excursions, remove it from the database.
       } else {
-        this.result = undefined;
 
         this.result = this.vacationService.removeVacation(this.recievedVacationId);
-        console.log("Result Info: ");
+
+        console.log("The Raw Result Info: ");
         console.log(this.result);
 
-        var resultData: any = undefined;
-
-        this.result.then((data: any) =>{
-          resultData = data;
+        this.result.then((data: any) => {
+          console.log("The Deeper Result Info: ");
+          console.log(data);
+          this.resultData = data;
         });
 
-        console.log("Deeper Result info: ");
-        console.log(resultData);
-
         // TODO: Find out why the vacations are not being deleted from the Vacation list.
-        if (this.result != undefined && this.result != -1 && this.result != Error) {
+        if (this.resultData != String && this.resultData != -1) {
           console.log('Vacation deleted. Now, you have more storage space to make a new one!');
           alert('Vacation deleted. Now, you have more storage space to make a new one!');
           this.commService.transmitData(this.recievedAccountId);
@@ -353,8 +352,7 @@ export class VacationDetails implements OnInit {
       console.log("Transferring Account Id: " + this.recievedAccountId);
       this.commService.transmitData2(this.recievedAccountId);
       console.log("Transferring Vacation Id: " + this.recievedVacationId);
-      this.commService.transmitData3(this.recievedVacationId);
-      // this.commService.transmitDataString(this.chosenExcursionId + ',' + this.recievedAccountId + ',' + this.recievedVacationId);
+      this.commService.transmitData3(this.recievedVacationId);  
       this.router.navigate(['/excursion-details']);
 
     // If the vacation does not exist, don't do anything.
@@ -376,29 +374,15 @@ export class VacationDetails implements OnInit {
       console.log('Searching for Excursions with this title: ' + this.processedValue);
       this.excursions = [];
 
-      // this.excursionService.retrieve().subscribe((data) => {
-      //   console.log(data);
-
-      //   // Only one excursion? If it has the search value, add it.
-      //   if (data._embedded == undefined && data.title.includes(this.processedValue)) {
-      //     this.excursions.push(data);
-
-      //   // More than one excursion? Add only the user's excursions that have the search value.
-      //   } else {
-      //     for (let excursion of data._embedded.excursions) {
-      //       if (excursion.vacationId == this.recievedVacationId && excursion.title.includes(this.processedValue)) {
-      //         this.excursions.push(excursion);
-      //       }
-      //     }
-      //   }
-      // });
-
       // Searching for excursions using Firestore
       this.excursionService.retrieveExcursions(this.recievedAccountId).then((data) => {
 
-        console.log("Excursions to search through: " + data);
+        console.log("Excursions to search through: ");
+        console.log(data);
+
         data.forEach(item => {
-          if (item != undefined && item.title != undefined && item.title.includes(this.processedValue)){
+          if (item != undefined && item.account_id == this.recievedAccountId && item.vacation_id == this.recievedVacationId 
+            && item.title != undefined && item.title.includes(this.processedValue)){
             console.log("Adding this Item: " + item);
             this.excursions.push(item);
           }

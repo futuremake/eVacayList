@@ -44,20 +44,6 @@ export class NewPassword implements OnInit {
 
   ngOnInit(): void {
     
-    // Get the accounts in the database
-    this.accountService.retrieve().subscribe((data) => {
-      console.log(data);
-
-      if (data._embedded == undefined) {
-        this.accounts = data;
-      } else {
-        for (let account of data._embedded.accounts){
-          this.accounts.push(account);
-        }
-      }
-    });
-
-
     // Get the accounts from the Firestore database
     this.accountService.retrieveAccounts().then(data => {
       console.log(data);

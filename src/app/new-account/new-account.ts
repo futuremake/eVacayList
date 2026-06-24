@@ -29,6 +29,8 @@ export class NewAccount {
 
   submitted = false;
 
+  resultData: any = undefined;
+
   constructor (private accountService: AccountService, private router: Router) {}
 
   // Create a new account
@@ -56,12 +58,15 @@ export class NewAccount {
     this.signupForm.reset();
 
     const result = this.accountService.createAccount(this.newAccount.username, this.newAccount.email, this.newAccount.password, this.newAccount.passcode);
+    
+    result.then((data) => {
+      console.log("Resulting Data: ");
+      console.log(data);
+      this.resultData = data;
+    });
 
-    // setTimeout(function () {
-    //   console.log("Time to check the function!");
-    // }, 1000);
     // If the account was successfully made, go back to the log-in screen.
-    if ((result !instanceof Error) || (result.toString() != 'An unexpected error occurred.')) {
+    if (this.resultData == Number && this.resultData != String) {
       console.log('New account made: ', result);
       alert('New Account made! Let the vacation planning journey begin!');
       this.router.navigate(['/log-in']);

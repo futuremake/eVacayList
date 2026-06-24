@@ -264,7 +264,9 @@ export class ExcursionService {
           start_date: editStartDate,
           description: editDescription
         });
-        return e;
+        return excursionId;
+      } else {
+        return -1;
       }
     } catch (error) {
         if (error instanceof Error) {
@@ -287,18 +289,18 @@ export class ExcursionService {
         const removeRef = doc(db, "excursions", excursionId.toString());
         const r = await deleteDoc(removeRef);
 
-        return r;
+        return excursionId;
+      } else {
+        return -1;
       }
     } catch (error) {
-        if (error instanceof Error) {
-          console.log("Error Message: " + error.message);
-          return error.message;
-        } else {
-          console.log("Unknown error: " + error);
-          return "An Unknown Error has occurred.";
-        }
+      if (error instanceof Error) {
+        console.log("Error Message: " + error.message);
+        return error.message;
+      } else {
+        console.log("Unknown error: " + error);
+        return "An Unknown Error has occurred.";
       }
-
-    return -1;
+    }
   }
 }

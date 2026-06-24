@@ -246,8 +246,7 @@ export class VacationService {
       
       console.log('Vacation deleted successfully');
       return 'Vacation deleted successfully';
-    }
-    catch (error) {
+    } catch (error) {
       
       if (error instanceof Error) {
         console.log('Error message: ', error.message);
@@ -357,8 +356,12 @@ export class VacationService {
         console.log("The stringified vacationId to use for vacation deletion: " + vacationId.toString());
 
         const r = await deleteDoc(removeRef);
+        console.log("Data to return from the Delete service: ");
+        console.log(vacationId);
 
-        return r;
+        return vacationId;
+      } else {
+        return -1;
       }
     } catch (error) {
         if (error instanceof Error) {
@@ -370,6 +373,6 @@ export class VacationService {
         }
     }
 
-    return -1;
+    // return -1;
   }
 }
