@@ -79,8 +79,11 @@ export class VacationList implements OnInit{
     });
 
     // Getting the user's vacation plans from Firebase
-    this.rawAccounts = this.vacationService.retrieveVacations(this.receivedAccountId)
-    this.rawAccounts.then((data: any) => {
+    this.rawVacations = this.vacationService.retrieveVacations(this.receivedAccountId);
+    console.log("The Raw Vacation Data: ");
+    console.log(this.rawVacations);
+    
+    this.rawVacations.then((data: any) => {
       console.log(data);
       console.log("Vacations for this user: ");
       data.forEach((item: any) => {
@@ -150,13 +153,20 @@ export class VacationList implements OnInit{
       // Searching for vacations using Firestore
       const searchVacations = this.vacationService.retrieveVacations(this.receivedAccountId)
       searchVacations.then((data) => {
-        console.log("Vacation Data to search through: "); 
-        data.forEach((item: any) => {
-          if (item.account_id == this.receivedAccountId && item.title != undefined && item.title.includes(this.processedValue)) {
-            console.log("Adding Item: " + item);
-            this.vacations.push(item);
-          }
-        });
+        console.log("Vacation Data to search through: ");
+        console.log(data);
+
+        if (data instanceof Array){ 
+          data.forEach((item: any) => {
+            if (item.account_id == this.receivedAccountId && item.title != undefined && item.title.includes(this.processedValue)) {
+              console.log("Adding Item: " + item);
+              this.vacations.push(item);
+            }
+          });
+        } else {
+          console.log("Sorry, An Error has occurred Please try again later.");
+          alert("Sorry, an Error has occurred. Please try again later.");
+        }
       });
     
     // If the account does not exist, don't do anything.

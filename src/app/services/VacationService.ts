@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Vacation } from '../models/vacation.model';
-import { DocumentReference, DocumentData, Firestore, collectionData, query } from '@angular/fire/firestore';
+import { DocumentReference, DocumentData, Firestore, collectionData, query, deleteDoc as newDeleteDoc } from '@angular/fire/firestore';
 import { initializeApp } from 'firebase/app';
-import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc, query as fireQuery } from 'firebase/firestore';
 
 type CurrentVacation = {
   id: number | undefined;
@@ -66,7 +66,7 @@ export class VacationService {
   //   lodging: 'Motel 6',
   //   start_date: '2026-05-15',
   //   end_date: '2026-05-15',
-  //   description: '2026-05-15'
+  //   description: 'Experience the best Texas has to offer at the Texas State Fair!'
   // }]
 
   // constructor() { }
@@ -294,15 +294,16 @@ export class VacationService {
   // Retrieve all vacations in the Firebase Database
   public async retrieveVacations(accountId: number | undefined) {
 
-    
+    try {    
       const vacayRef = collection(db, "vacations");
       const q = query(vacayRef, where("id", "==", accountId));
       const querySnapshot = await getDocs(q);
 
+      this.foundVacation = new Vacation();
+      this.foundVacation.id = undefined;
       this.vacationsArray = [];
 
       console.log("Loading Vacations: ");
-
       querySnapshot.forEach((doc) => {
         console.log(doc.id + " => ");
         console.log(doc.data());
@@ -319,7 +320,17 @@ export class VacationService {
       });
       
       return this.vacationsArray;
-    
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("Error Message: " + error.message);
+        // return error.message;
+        return -1;
+      } else {
+        console.log("Unknown error: " + error);
+        // return "An Unknown Error has occurred.";
+        return -1;
+      }
+    }
   }
 
   // Update a Vacation in the FireBase Database
@@ -366,10 +377,12 @@ export class VacationService {
     } catch (error) {
         if (error instanceof Error) {
           console.log("Error Message: " + error.message);
-          return error.message;
+          // return error.message;
+          return -1;
         } else {
           console.log("Unknown error: " + error);
-          return "An Unknown Error has occurred.";
+          // return "An Unknown Error has occurred.";
+          return -1;
         }
     }
 

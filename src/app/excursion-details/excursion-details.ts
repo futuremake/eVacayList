@@ -62,23 +62,47 @@ export class ExcursionDetails implements OnInit {
 
   ngOnInit(): void {
 
-    // Retrieving the Real excursion Id from the vacation details page
-    this.commService.currentData$.subscribe((data) => {
-      console.log("The real Excursion Id: " + data);
-      this.receivedExcursionId = data;
-    });
+    // // Retrieving the Real excursion Id from the vacation details page
+    // this.commService.currentData$.subscribe((data) => {
+    //   console.log("The real Excursion Id: " + data);
+    //   this.receivedExcursionId = data;
+    // });
 
-    // Retrieving the Real account Id from the vacation details page
-    this.commService.currentData2$.subscribe((data) => {
-      console.log("The real Account Id: " + data);
-      this.receivedAccountId = data;
-    });
+    // // Retrieving the Real account Id from the vacation details page
+    // this.commService.currentData2$.subscribe((data) => {
+    //   console.log("The real Account Id: " + data);
+    //   this.receivedAccountId = data;
+    // });
 
-    // Retrieving the Real vacation Id from the vacation details page
-    this.commService.currentData3$.subscribe((data) => {
-      console.log("The real Vacation Id: " + data);
-      this.receivedVacationId = data;
-    });
+    // // Retrieving the Real vacation Id from the vacation details page
+    // this.commService.currentData3$.subscribe((data) => {
+    //   console.log("The real Vacation Id: " + data);
+    //   this.receivedVacationId = data;
+    // });
+
+    // Retrieving the excursion Id from session data
+    const excurInfo = JSON.parse(localStorage.getItem('excursionInfo') || '{}');
+    console.log("The raw Excursion info: ");
+    console.log(excurInfo);
+
+    this.receivedExcursionId = excurInfo.excursion_id;
+    console.log("The Excursion Id: " + this.receivedExcursionId);
+
+    // Retrieving the account Id from session data
+    const accountInfo = JSON.parse(localStorage.getItem('accountInfo') || '{}');
+    console.log("The raw Account info: ");
+    console.log(accountInfo);
+
+    this.receivedAccountId = accountInfo.account_id;
+    console.log("The Account Id: " + this.receivedAccountId);
+
+    // Retrieving the vacation Id from session data
+    const vacayInfo = JSON.parse(localStorage.getItem('vacationInfo') || '{}');
+    console.log("The raw Vacation info: ");
+    console.log(vacayInfo);
+
+    this.receivedVacationId = vacayInfo.vacation_id;
+    console.log("The Vacation Id: " + this.receivedVacationId);
 
     // Get the Vacation that holds the Excursion from Firebase.
     this.result = this.vacationService.retrieveVacations(this.receivedAccountId);
@@ -107,18 +131,23 @@ export class ExcursionDetails implements OnInit {
       console.log(data);
 
       // If the Excursion exists, get it's details as placeholders.
-      data.forEach((item: any) => {
-        if (this.receivedExcursionId != -1 && this.receivedExcursionId != undefined && this.receivedExcursionId == item.id){
-          this.checkExcursion = true;
-          this.ExcurTitle = item.title + ' Details:';
-          this.chosenExcursion.id = item.id;
-          this.chosenExcursion.account_id = item.account_id;
-          this.chosenExcursion.vacation_id = item.vacation_id;
-          this.chosenExcursion.title = item.title;
-          this.chosenExcursion.start_date = item.start_date;
-          this.chosenExcursion.description = item.description;
-        }
-      });
+      if (data != -1) {
+        data.forEach((item: any) => {
+          if (this.receivedExcursionId != -1 && this.receivedExcursionId != undefined && this.receivedExcursionId == item.id){
+            this.checkExcursion = true;
+            this.ExcurTitle = item.title + ' Details:';
+            this.chosenExcursion.id = item.id;
+            this.chosenExcursion.account_id = item.account_id;
+            this.chosenExcursion.vacation_id = item.vacation_id;
+            this.chosenExcursion.title = item.title;
+            this.chosenExcursion.start_date = item.start_date;
+            this.chosenExcursion.description = item.description;
+          }
+        });
+      } else {
+        console.log('Sorry, an error has occurred with retrieving Excursion info. Please try again later.');
+        alert('Sorry, an error has occurred with retrieving Excursion info. Please try again later.');
+      }
 
       // If the Excursion doesn't exist, set up placeholder values.
       if (!this.checkExcursion) {
@@ -350,7 +379,7 @@ export class ExcursionDetails implements OnInit {
       console.log(this.result); 
 
       this.result.then((data: any) => {
-        if (data != undefined && data != String && data != -1) {
+        if (data != undefined && data != -1) {
           console.log('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
           alert('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
           this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);

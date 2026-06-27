@@ -66,7 +66,7 @@ export class NewAccount {
     });
 
     // If the account was successfully made, go back to the log-in screen.
-    if (this.resultData == Number && this.resultData != String) {
+    if (this.resultData != -1) {
       console.log('New account made: ', result);
       alert('New Account made! Let the vacation planning journey begin!');
       this.router.navigate(['/log-in']);

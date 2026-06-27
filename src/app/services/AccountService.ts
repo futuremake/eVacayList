@@ -172,10 +172,10 @@ constructor(private http: HttpClient) { }
       // Stop if something went wrong happened    
       if (error instanceof Error) {
         console.log('Error message: ', error.message);
-        return error.message;
+        return -1;
       } else {
         console.log('Unexpected Error: ', error);
-        return 'An unexpected error occurred.';
+        return -1;
       }
     }
   }
@@ -196,7 +196,6 @@ constructor(private http: HttpClient) { }
       querySnapshot.forEach(doc => {
         console.log(doc.id + " => ");
         console.log(doc.data());
-        // console.log(doc.data()['email']);
         this.foundAccount.id = doc.data()['id'];
         this.foundAccount.email = doc.data()['email'];
         this.foundAccount.username = doc.data()['username'];
@@ -210,13 +209,13 @@ constructor(private http: HttpClient) { }
       // return querySnapshot;
       return this.accountsArray;
     } catch (error) {
-        if (error instanceof Error) {
-          console.log("Error Message: " + error.message);
-          return error.message;
-        } else {
-          console.log("Unknown error: " + error);
-          return "An Unknown Error has occurred.";
-        }
+      if (error instanceof Error) {
+        console.log("Error Message: " + error.message);
+        return error.message;
+      } else {
+        console.log("Unknown error: " + error);
+        return "An Unknown Error has occurred.";
+      }
     }
   }
 

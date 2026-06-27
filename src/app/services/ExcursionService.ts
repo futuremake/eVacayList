@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Excursion } from '../models/excursion.model';
-import { DocumentReference, DocumentData, Firestore, query, collectionData } from '@angular/fire/firestore';
+import { DocumentReference, DocumentData, Firestore, query, collectionData, addDoc as newAddDoc } from '@angular/fire/firestore';
 import { initializeApp } from 'firebase/app';
-import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, orderBy, getFirestore, where, updateDoc, doc, deleteDoc, query as fireQuery } from 'firebase/firestore';
 
 type CurrentExcursion = {
   id: number | undefined;
@@ -215,10 +215,12 @@ export class ExcursionService {
       } catch (error) {
         if (error instanceof Error) {
           console.log("Error message: " + error.message);
-          return error.message;
+          // return error.message;
+          return -1;
         } else {
           console.log("Unknown Error: " + error);
-          return "An Unknown Error has occurred.";
+          // return "An Unknown Error has occurred.";
+          return -1;
         } 
       }
   }
@@ -226,27 +228,39 @@ export class ExcursionService {
   // Retrieve an excursion from the FireStore Database
   public async retrieveExcursions(accountId: number | undefined) {
 
-    const excursionRef = collection(db, "excursions")
-    const q = query(excursionRef, where("account_id", "==", accountId));
-    const querySnapshot = await getDocs(q);
+    try {
+      const excursionRef = collection(db, "excursions")
+      const q = fireQuery(excursionRef, where("account_id", "==", accountId));
+      const querySnapshot = await getDocs(q);
 
-    this.excursionArray = [];
+      this.excursionArray = [];
 
-    console.log("Loading Excursions: ");
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id + " => " );
-      console.log(doc.data());
-      this.currentExcursion.id = doc.data()['id'];
-      this.currentExcursion.account_id = doc.data()['account_id'];
-      this.currentExcursion.vacation_id = doc.data()['vacation_id'];
-      this.currentExcursion.title = doc.data()['title'];
-      this.currentExcursion.start_date = doc.data()['start_date'];
-      this.currentExcursion.description = doc.data()['description'];
-      this.excursionArray.push(this.currentExcursion);
-      this.currentExcursion = new Excursion();
-    });
+      console.log("Loading Excursions: ");
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id + " => " );
+        console.log(doc.data());
+        this.currentExcursion.id = doc.data()['id'];
+        this.currentExcursion.account_id = doc.data()['account_id'];
+        this.currentExcursion.vacation_id = doc.data()['vacation_id'];
+        this.currentExcursion.title = doc.data()['title'];
+        this.currentExcursion.start_date = doc.data()['start_date'];
+        this.currentExcursion.description = doc.data()['description'];
+        this.excursionArray.push(this.currentExcursion);
+        this.currentExcursion = new Excursion();
+      });
 
-    return this.excursionArray;
+      return this.excursionArray;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("Error Message: " + error.message);
+        // return error.message;
+        return -1;
+      } else {
+        console.log("Unknown error: " + error);
+        // return "An Unknown Error has occurred.";
+        return -1;        
+      }
+    }
   }
 
   // Update an Excursion in the Firebase database
@@ -296,10 +310,12 @@ export class ExcursionService {
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error Message: " + error.message);
-        return error.message;
+        // return error.message;
+        return -1;
       } else {
         console.log("Unknown error: " + error);
-        return "An Unknown Error has occurred.";
+        // return "An Unknown Error has occurred.";
+        return -1;
       }
     }
   }

@@ -58,37 +58,6 @@ export class Profile implements OnInit {
       console.log("Retrieved Account Id: " + this.receivedAccountId);
     });
 
-    // // Retrieving the account and showing its' details
-    // this.accountService.retrieve().subscribe((data) => {
-    //   if (data._embedded == undefined) {
-    //     console.log(data);
-    //     // this.user.id = data.id;
-    //     // this.user.email = data.email;
-    //     // this.user.username = data.username;
-
-    //     this.currentAccount.id = data.id;
-    //     this.currentAccount.username = data.username;
-    //     this.currentAccount.email = data.email;
-    //     this.currentAccount.password = data.password;
-    //     this.currentAccount.passcode = data.passcode;
-    //   } else {
-    //     for (let account of data._embedded.accounts) {
-    //       console.log(data);
-    //       if(account.id == this.receivedAccountId) {
-    //         // this.user.id = account.id;
-    //         // this.user.email = account.email;
-    //         // this.user.username = account.username;
-            
-    //         this.currentAccount.id = account.id;
-    //         this.currentAccount.email = account.email;
-    //         this.currentAccount.username = account.username;
-    //         this.currentAccount.password = account.password;
-    //         this.currentAccount.passcode = account.passcode;
-    //       }
-    //     }
-    //   }
-    // });
-
     // Retrieving the account from Firestore and showing its details
     this.accountService.retrieveAccounts().then((data) => {
       console.log("Data recieved: " + data);
@@ -133,12 +102,20 @@ export class Profile implements OnInit {
 
     // Checking if this account has any vacations in it from Firestore
     this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
-      console.log("Vacations retrieved from this account: " + data.length);
-      data.forEach(item => {
-        if (item != undefined && item.account_id == this.receivedAccountId) {
-          this.hasVacay = true;
-        }
-      });
+      if (data instanceof Array) {
+        console.log("Vacations retrieved from this account: " + data.length);
+      }
+
+      if (data instanceof Array){
+        data.forEach(item => {
+          if (item != undefined && item.account_id == this.receivedAccountId) {
+            this.hasVacay = true;
+          }
+        });
+      } else {
+        console.log("Sorry, An Error has occurred Please try again later.");
+        alert("Sorry, an Error has occurred. Please try again later.");
+      }
     });
     console.log('Does this Account have any vacations? ' + this.hasVacay);
 
