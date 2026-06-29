@@ -146,15 +146,21 @@ export class VacationDetails implements OnInit {
     console.log('Show me the excursion details!');
     alert('Show me the excursion details!');
     this.chosenExcursionId = excurId;
+
     console.log("Transferring Excursion Id: ");
     console.log(this.chosenExcursionId);
-    this.commService.transmitData(this.chosenExcursionId);
+    // this.commService.transmitData(this.chosenExcursionId);
+    sessionStorage.setItem('excursionInfo', JSON.stringify({'excursion_id' : this.chosenExcursionId}));
+
     console.log("Transferring Account Id: ");
     console.log(this.recievedAccountId);
-    this.commService.transmitData2(this.recievedAccountId);
+    // this.commService.transmitData2(this.recievedAccountId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
+
     console.log("Transferring Vacation Id: ");
     console.log(this.recievedVacationId);
-    this.commService.transmitData2(this.recievedVacationId);
+    // this.commService.transmitData2(this.recievedVacationId);
+    sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.recievedVacationId}));
     
     // this.commService.transmitDataString(this.chosenExcursionId + ',' + this.recievedAccountId + ',' + this.recievedVacationId);
     this.router.navigate(['/excursion-details']);

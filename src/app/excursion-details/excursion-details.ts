@@ -81,7 +81,7 @@ export class ExcursionDetails implements OnInit {
     // });
 
     // Retrieving the excursion Id from session data
-    const excurInfo = JSON.parse(localStorage.getItem('excursionInfo') || '{}');
+    const excurInfo = JSON.parse(sessionStorage.getItem('excursionInfo') || '{}');
     console.log("The raw Excursion info: ");
     console.log(excurInfo);
 
@@ -89,7 +89,7 @@ export class ExcursionDetails implements OnInit {
     console.log("The Excursion Id: " + this.receivedExcursionId);
 
     // Retrieving the account Id from session data
-    const accountInfo = JSON.parse(localStorage.getItem('accountInfo') || '{}');
+    const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo') || '{}');
     console.log("The raw Account info: ");
     console.log(accountInfo);
 
@@ -97,7 +97,7 @@ export class ExcursionDetails implements OnInit {
     console.log("The Account Id: " + this.receivedAccountId);
 
     // Retrieving the vacation Id from session data
-    const vacayInfo = JSON.parse(localStorage.getItem('vacationInfo') || '{}');
+    const vacayInfo = JSON.parse(sessionStorage.getItem('vacationInfo') || '{}');
     console.log("The raw Vacation info: ");
     console.log(vacayInfo);
 
