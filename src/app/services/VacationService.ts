@@ -362,7 +362,10 @@ export class VacationService {
 
     try {
       if (vacationId != undefined) {
-        const removeRef = doc(db, "vacation", vacationId.toString());
+
+        // The problem was with the code below. I just had to change "vacation",
+        // to "vacations"!
+        const removeRef = doc(db, "vacations", vacationId.toString());
         
         console.log("The stringified vacationId to use for vacation deletion: " + vacationId.toString());
 

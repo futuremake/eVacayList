@@ -332,48 +332,47 @@ export class VacationDetails implements OnInit {
 
   // Delete a vacation
   deleteVacay(): void {
-    
-    // Don't do anything if the vacation doesn't exist
+
+    // Don't do anything if the vacation does not exist
     if (this.recievedVacationId == undefined || this.recievedVacationId == -1) {
       alert('You can\'t delete a vacation that doesn\'t exist!');
-    } else {
-      
-      console.log('Number of this vacation\'s excursions: ' + this.excursions.length);
-      
-      // If the vacation has excursions, don't delete it.
-      if (this.anyExcurs) {
-        console.log('We can\'t delete a Vacation with Excursions!');
-        alert('We can\'t delete a Vacation with Excursions!');
-      
-      // If the vacation has no excursions, remove it from the database.
-      } else {
-
-        this.result = this.vacationService.removeVacation(this.recievedVacationId);
-
-        console.log("The Raw Result Info: ");
-        console.log(this.result);
-
-        this.result.then((data: any) => {
-          console.log("The Deeper Result Info: ");
-          console.log(data);
-          this.resultData = data;
-        });
-
-        // TODO: Find out why the vacations are not being deleted from the Vacation list.
-        if (this.resultData != -1) {
-          console.log('Vacation deleted. Now, you have more storage space to make a new one!');
-          alert('Vacation deleted. Now, you have more storage space to make a new one!');
-          // this.commService.transmitData(this.recievedAccountId);
-
-          sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
-          this.router.navigate(['/vacation-list']);
-        
-        } else {
-          console.log('Sorry, there was an error. You will have to wait to delete your vacation.');
-          alert('Sorry, there was an error. You will have to wait to delete your vacation.');
-        }
-      } 
+      return;
     }
+
+    console.log('Number of this vacation\'s excursions: ' + this.excursions.length);
+    
+    // If the vacation has excursions, don't delete it.
+    if (this.anyExcurs) {
+      console.log('We can\'t delete a Vacation with Excursions!');
+      alert('We can\'t delete a Vacation with Excursions!');
+      return;
+    }
+
+    // If the vacation has no excursions, remove it from the Database.
+    // This time, we handle everything INSIDE the '.then()' block.
+    this.vacationService.removeVacation(
+      // this.recievedVacationId
+      this.chosenVacation.id).then((data: any) => {
+
+      console.log("The Result Info: ");
+      console.log(data);
+      this.resultData = data;
+
+      // This block now waits perfectly for the database to finish before checking the result
+      if (this.resultData != -1) {
+        console.log('Vacation deleted. Now, you have more storage space to make a new one!');
+        alert('Vacation deleted. Now, you have more storage space to make a new one!');
+        sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
+        this.router.navigate(['/vacation-list']);
+      } else {
+        console.log('Sorry, there was an error. You will have to wait to delete your vacation.');
+        alert('Sorry, there was an error. You will have to wait to delete your vacation.');
+      }
+    }).catch((error: any) => {
+      console.error('Firebase Error failed dramatically: ', error);
+      alert('A network or database error occurred while trying to delete.');
+    });
+
   }
 
   // Add a new Excursion to the database.
