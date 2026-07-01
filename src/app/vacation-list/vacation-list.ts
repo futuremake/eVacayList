@@ -51,11 +51,19 @@ export class VacationList implements OnInit{
 
   ngOnInit(): void {
 
-    // Receiving the account id from the login screen
-    this.commService.currentData$.subscribe((data) => {
-      this.receivedAccountId = data;
-      console.log("Retrieved Account Id: " + this.receivedAccountId);
-    });
+    // // Receiving the account id from the login screen
+    // this.commService.currentData$.subscribe((data) => {
+    //   this.receivedAccountId = data;
+    //   console.log("Retrieved Account Id: " + this.receivedAccountId);
+    // });
+
+    // Receiving the account id from sessionStorage
+    const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo') || '{}');
+    console.log('Raw account data: ');
+    console.log(accountInfo);
+
+    this.receivedAccountId = accountInfo.account_id;
+    console.log('The received account Id: ' + this.receivedAccountId);
 
     // Retrieving the account from Firebase
     this.rawAccounts = this.accountService.retrieveAccounts();
@@ -101,21 +109,25 @@ export class VacationList implements OnInit{
     this.chosenVacationId = vacayId;
     console.log('Show me the vacay details!');
     alert('Show me the vacay details!');
-    this.commService.transmitData(this.receivedAccountId);
-    this.commService.transmitData2(this.chosenVacationId);
+    // this.commService.transmitData(this.receivedAccountId);
+    // this.commService.transmitData2(this.chosenVacationId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+    sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.chosenVacationId}));
+
     this.router.navigate(['/vacation-details']);
   }
 
   // Go back to the login screen.
   logOutPath(): void {
-    alert('Want someone else to make a list? Alright then.');
+    alert('Want someone else to make a list? Alright then. (Make sure you close your browser to protect your data.)');
     this.router.navigate(['/log-in']);
   }
 
   // Go to the user's profile.
   profilePath(): void {
     alert('We\'ve got your identification right here!');
-    this.commService.transmitData(this.receivedAccountId);
+    // this.commService.transmitData(this.receivedAccountId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
     this.router.navigate(['/profile']);
   }
 
@@ -126,10 +138,14 @@ export class VacationList implements OnInit{
     if (this.receivedAccountId != undefined && this.receivedAccountId != -1) {
       console.log('Let\'s build a vacay!');
       alert('Let\'s build a vacay!');
-      this.commService.transmitData(this.receivedAccountId);
+      // this.commService.transmitData(this.receivedAccountId);
       console.log("Transferring AccountId: " + this.receivedAccountId);
-      this.commService.transmitData2(this.chosenVacationId);
+      sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+
+      // this.commService.transmitData2(this.chosenVacationId);
       console.log("Transferring VacationId: " + this.chosenVacationId);
+      sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.chosenVacationId}));
+      
       this.router.navigate(['/vacation-details']);
 
     // If the account does not exist, don't do anything.

@@ -77,17 +77,33 @@ export class VacationDetails implements OnInit {
 
   ngOnInit(): void {
 
-    // Retrieve the real account Id
-    this.commService.currentData$.subscribe((data) => {
-      this.recievedAccountId = data;
-      console.log('The real received AccountId: ' + this.recievedAccountId);
-    });
+    // // Retrieve the real account Id
+    // this.commService.currentData$.subscribe((data) => {
+    //   this.recievedAccountId = data;
+    //   console.log('The real received AccountId: ' + this.recievedAccountId);
+    // });
 
-    // Retrieve the real vacation Id
-    this.commService.currentData2$.subscribe((data) => {
-      this.recievedVacationId = data;
-      console.log('The real received vacationId: ' + this.recievedVacationId);
-    });
+    // // Retrieve the real vacation Id
+    // this.commService.currentData2$.subscribe((data) => {
+    //   this.recievedVacationId = data;
+    //   console.log('The real received vacationId: ' + this.recievedVacationId);
+    // });
+
+    // Retrieve the Account Id from sessionStorage
+    const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo') || '{}');
+    console.log('The raw account info: ');
+    console.log(accountInfo);
+
+    this.recievedAccountId = accountInfo.account_id;
+    console.log("The account Id: " + this.recievedAccountId);
+
+    // Retrieve the Vacation Id from sessionStorage
+    const vacationInfo = JSON.parse(sessionStorage.getItem('vacationInfo') || '{}');
+    console.log('The raw vacation info: ');
+    console.log(vacationInfo);
+
+    this.recievedVacationId = vacationInfo.vacation_id;
+    console.log("The vacation id: " + this.recievedVacationId);
 
     // Get the Vacation details from Firebase.
     this.vacationService.retrieveVacations(this.recievedAccountId).then((data) => {
@@ -169,14 +185,16 @@ export class VacationDetails implements OnInit {
   // Go back to the vacation list.
   vacayListReturn() {
     alert('Back to the big list!');
-    this.commService.transmitData(this.recievedAccountId);
+    // this.commService.transmitData(this.recievedAccountId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
     this.router.navigate(['/vacation-list']);
   }
 
   // Show the user their profile information.
   profilePath(): void {
     alert('We\'ve got your identification right here!');
-    this.commService.transmitData(this.recievedAccountId);
+    // this.commService.transmitData(this.recievedAccountId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
     this.router.navigate(['/profile']);
   }
 
@@ -259,7 +277,9 @@ export class VacationDetails implements OnInit {
       if (this.result != undefined && this.result != Error) {
         console.log('Congratulations! You have just created a vacation plan!');
         alert('Congratulations! You have just created a vacation plan!');
-        this.commService.transmitData(this.recievedAccountId);
+        // this.commService.transmitData(this.recievedAccountId);
+
+        sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
         this.router.navigate(['/vacation-list']);
 
       // Catch any errors that may appear.
@@ -288,7 +308,9 @@ export class VacationDetails implements OnInit {
       if (this.result != undefined && this.result != -1) {
         console.log('You have successfully imporved your vacation plan.');
         alert('You have successfully imporved your vacation plan.');
-        this.commService.transmitData(this.recievedAccountId);
+        // this.commService.transmitData(this.recievedAccountId);
+
+        sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
         this.router.navigate(['/vacation-list']);
         
       // Catch any errors that may appear.
@@ -341,7 +363,9 @@ export class VacationDetails implements OnInit {
         if (this.resultData != -1) {
           console.log('Vacation deleted. Now, you have more storage space to make a new one!');
           alert('Vacation deleted. Now, you have more storage space to make a new one!');
-          this.commService.transmitData(this.recievedAccountId);
+          // this.commService.transmitData(this.recievedAccountId);
+
+          sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
           this.router.navigate(['/vacation-list']);
         
         } else {

@@ -28,6 +28,11 @@
 
 <button class="deleteButton" type="button" (click)="deleteExcur()">Delete Excursion?</button>
 
+@if (this.receivedExcursionId == -1) {
+    <p class="newExcurNotes">Make your new Excursion Here!</p>
+    <p class="newExcurNotes">*If you don't use the Datepicker, please type your Excursion start date in this format: "mm/dd/yyyy".</p>
+}
+
 <div class="container">
     <div class="row">
         <div class="col-6" id="formInput">
@@ -55,9 +60,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="start_date">Start Date:</label>
+                        <label for="start_date">Start Date: {{ this.chosenExcursion.start_date }}</label>
                         <input
-                        type="text"
+                        type="date"
                         id="start_date"
                         class="form-control"
                         ngModel

@@ -20,11 +20,20 @@ export class HowTo implements OnInit {
 
   ngOnInit(): void {
     
-    // Recieving the account id (if it exists)
-    this.commService.currentData$.subscribe((data) => {
-      this.receivedAccountId = data;
-      console.log("Received data: " + data);
-    });
+    // // Recieving the account id (if it exists)
+    // this.commService.currentData$.subscribe((data) => {
+    //   this.receivedAccountId = data;
+    //   console.log("Received data: " + data);
+    // });
+
+    // Receiving the account id from sessionStorage (if it exists)
+    const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo') || '{}');
+    console.log('The raw account info: ');
+    console.log(accountInfo);
+
+    this.receivedAccountId = accountInfo.account_id;
+    console.log('The received account Id: ' + this.receivedAccountId);
+
   }
 
   // Send the user back to the previous page
@@ -39,7 +48,9 @@ export class HowTo implements OnInit {
     // Send the user back to the vacation list page.
     if (this.receivedAccountId != undefined && this.receivedAccountId != -1){
       alert('Going back to the Vacation List page!');
-      this.commService.transmitData(this.receivedAccountId);
+      // this.commService.transmitData(this.receivedAccountId);
+
+      sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
       this.router.navigate(['/vacation-list']);
     } 
   }

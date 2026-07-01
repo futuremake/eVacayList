@@ -151,9 +151,12 @@ export class ExcursionDetails implements OnInit {
 
       // If the Excursion doesn't exist, set up placeholder values.
       if (!this.checkExcursion) {
+        this.ExcurTitle = this.currentVacation.title + " from " 
+                                     + this.currentVacation.start_date + " to " 
+                                     + this.currentVacation.end_date;
         this.chosenExcursion.account_id = this.receivedAccountId;
         this.chosenExcursion.vacation_id = this.receivedVacationId;
-        this.chosenExcursion.title = 'Excur1';
+        this.chosenExcursion.title = 'excur1';
         this.chosenExcursion.start_date = '2026-05-05';
         this.chosenExcursion.description = 'A short description about the excursion.';
       }
@@ -166,15 +169,21 @@ export class ExcursionDetails implements OnInit {
     alert('Let\'s see the big picture of this vacation plan.');
     console.log('Sending back this Account id: ' + this.receivedAccountId);
     console.log('Sending back this vacation id: ' + this.receivedVacationId);
-    this.commService.transmitData(this.receivedAccountId);
-    this.commService.transmitData2(this.receivedVacationId);
+    // this.commService.transmitData(this.receivedAccountId);
+    // this.commService.transmitData2(this.receivedVacationId);
+    sessionStorage.setItem('accountInfo', JSON.stringify({account_id : this.receivedAccountId}));
+    sessionStorage.setItem('vacationInfo', JSON.stringify({vacation_id : this.receivedVacationId}));
+
+
     this.router.navigate(['/vacation-details']);
   }
 
   // Going to see the user's info.
   profilePath(): void {
     alert('We\'ve got your identification right here!');
-    this.commService.transmitData(this.chosenExcursion.account_id);
+    // this.commService.transmitData(this.chosenExcursion.account_id);
+
+    sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
     this.router.navigate(['/profile']);
   }
 
@@ -307,10 +316,16 @@ export class ExcursionDetails implements OnInit {
         if (data != undefined && data != String && data != -1) {
           console.log('Congratulations! You just created an excursion plan!');
           alert('Congratulations! You just created an excursion plan!');
-          this.commService.transmitData(this.receivedAccountId);
+          // this.commService.transmitData(this.receivedAccountId);
+
           console.log("Transferring accountId: " + this.receivedAccountId);
-          this.commService.transmitData2(this.receivedVacationId);
+          sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+
+          // this.commService.transmitData2(this.receivedVacationId);
+
           console.log("Transferring vacationId: " + this.receivedVacationId);
+          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.receivedVacationId}));
+          
           this.router.navigate(['/vacation-details']);
 
         // Catch errors when they occur.
@@ -342,8 +357,11 @@ export class ExcursionDetails implements OnInit {
         if (data != undefined && data != String && data != -1){
           console.log('Congratulations! You\'ve successfully updated your excursion plan!');
           alert('Congratulations! You\'ve successfully updated your excursion plan!');
-          this.commService.transmitData(this.receivedAccountId);
-          this.commService.transmitData2(this.receivedVacationId);
+          // this.commService.transmitData(this.receivedAccountId);
+          // this.commService.transmitData2(this.receivedVacationId);
+
+          sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_info' : this.receivedVacationId}));
           this.router.navigate(['/vacation-details']);
         
         // Catch errors when they occur.
@@ -382,7 +400,10 @@ export class ExcursionDetails implements OnInit {
         if (data != undefined && data != -1) {
           console.log('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
           alert('Done with your Excursion? Then we\'ll remove it so you have space to make a new one!');
-          this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+          // this.commService.transmitDataString(this.receivedAccountId + ',' + this.receivedVacationId);
+
+          sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.receivedVacationId}));
           this.router.navigate(['/vacation-details']);
         
         // Catch errors when they appear.

@@ -52,12 +52,20 @@ export class Profile implements OnInit {
     this.currentAccount.password = '???????';
     this.currentAccount.passcode = '???????';
     
-    // Receiving the account id from the previous screen
-    this.commService.currentData$.subscribe((data) => {
-      this.receivedAccountId = data;
-      console.log("Retrieved Account Id: " + this.receivedAccountId);
-    });
+    // // Receiving the account id from the previous screen
+    // this.commService.currentData$.subscribe((data) => {
+    //   this.receivedAccountId = data;
+    //   console.log("Retrieved Account Id: " + this.receivedAccountId);
+    // });
 
+    // Receiving the account id from sessionStorage
+    const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo') || '{}');
+    console.log('The raw account data: ');
+    console.log(accountInfo);
+
+    this.receivedAccountId = accountInfo.account_id;
+    console.log('The received account id: ' + this.receivedAccountId);
+    
     // Retrieving the account from Firestore and showing its details
     this.accountService.retrieveAccounts().then((data) => {
       console.log("Data recieved: " + data);
@@ -124,14 +132,17 @@ export class Profile implements OnInit {
   // Going back to the vacation list page
   vacayListPath(): void {
     alert('Going back to the vacay list!');
-    this.commService.transmitData(this.currentAccount.id);
+    // this.commService.transmitData(this.currentAccount.id);
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
     this.router.navigate(['/vacation-list']);
   }
 
   // Going to the help page
   helpPagePath(): void {
     alert('Want some help? To the help center!');
-    this.commService.transmitData(this.currentAccount.id);
+    // this.commService.transmitData(this.currentAccount.id);
+    
+    sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
     this.router.navigate(['/how-to']);
   }
 
@@ -150,12 +161,16 @@ export class Profile implements OnInit {
     // Make sure the profile info was really changed
     if (this.result != undefined && this.result != -1) {
       alert('You have successfully updated your account!');
-      this.commService.transmitData(this.receivedAccountId);
+      // this.commService.transmitData(this.receivedAccountId);
+
+      sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
       this.router.navigate(['/vacation-list']);
     
     // Catch any Errors that occur
     } else {
-
+      console.log("Sorry, An Error has occurred Please try again later.");
+      alert("Sorry, an Error has occurred. Please try again later.");
+      this.updateForm.reset();
     }
     
     
@@ -183,7 +198,8 @@ export class Profile implements OnInit {
         
         if (this.result != undefined && this.result != -1) {
           console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
-          alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
+          alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!'
+            + ' (Make sure you close your browser to protect your data.)');
           this.router.navigate(['/home']);
         } else {
           console.log('Sorry, an Error has occurred. If you really want to delete your account, wait until later.')

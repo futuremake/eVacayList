@@ -114,7 +114,9 @@ export class LogIn {
       // If the account exixts, go to the list.
       console.log("Found the Account!");
       alert("Found the Account! To the List building site!");
-      this.commService.transmitData(this.accountId);
+      // this.commService.transmitData(this.accountId);
+
+      sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.accountId}));
       this.router.navigate(['/vacation-list']);
     } else {
 
