@@ -300,60 +300,58 @@ export class ExcursionDetails implements OnInit {
     }
     
     // If the excursion is new, save it to the database
-    // TODO: Make sure the Account, and Vacation IDs are not changed back to "-1" when they get to this point.
     if (this.receivedExcursionId != undefined && this.receivedExcursionId == -1){
-      this.result = this.excursionService.createExcursion(this.receivedAccountId, this.receivedVacationId, 
-      this.chosenExcursion.title, this.chosenExcursion.start_date, this.chosenExcursion.description);
+      this.excursionService.createExcursion(this.receivedAccountId, this.receivedVacationId, 
+        this.chosenExcursion.title, this.chosenExcursion.start_date, this.chosenExcursion.description)
+        .then((data) => {
+        
+          console.log("The result data: ");
+          console.log(data);
 
-      console.log("The raw result data for creating excursions: ");
-      console.log(this.result); 
+          if (data != undefined && data != -1) {
+            console.log('Congratulations! You just created an excursion plan!');
+            alert('Congratulations! You just created an excursion plan!');
+            // this.commService.transmitData(this.receivedAccountId);
 
-      this.result.then((data: any) => {
+            console.log("Transferring accountId: " + this.receivedAccountId);
+            sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
 
-        console.log("The Deeper result data: ");
-        console.log(data);
+            // this.commService.transmitData2(this.receivedVacationId);
 
-        if (data != undefined && data != String && data != -1) {
-          console.log('Congratulations! You just created an excursion plan!');
-          alert('Congratulations! You just created an excursion plan!');
-          // this.commService.transmitData(this.receivedAccountId);
+            console.log("Transferring vacationId: " + this.receivedVacationId);
+            sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.receivedVacationId}));
+            
+            this.router.navigate(['/vacation-details']);
 
-          console.log("Transferring accountId: " + this.receivedAccountId);
-          sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+          // Catch errors when they occur.
+          } else {
+            console.log('Sorry, there was an unknown error. Please try again later.');
+            alert('Sorry, there was an unknown error. Please try again later.');
 
-          // this.commService.transmitData2(this.receivedVacationId);
+            this.chosenExcursion.account_id = -1;
+            this.chosenExcursion.vacation_id = -1;
+            this.chosenExcursion.title = 'Excur1';
+            this.chosenExcursion.start_date = '2026-05-05';
+            this.chosenExcursion.description = 'A short description about the excursion.';
 
-          console.log("Transferring vacationId: " + this.receivedVacationId);
-          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.receivedVacationId}));
-          
-          this.router.navigate(['/vacation-details']);
-
-        // Catch errors when they occur.
-        } else {
-          console.log('Sorry, there was an unknown error. Please try again later.');
-          alert('Sorry, there was an unknown error. Please try again later.');
-
-          this.chosenExcursion.account_id = -1;
-          this.chosenExcursion.vacation_id = -1;
-          this.chosenExcursion.title = 'Excur1';
-          this.chosenExcursion.start_date = '2026-05-05';
-          this.chosenExcursion.description = 'A short description about the excursion.';
-
-          return;
-        }
+            return;
+          }
+      }).catch((error : any) => {
+        console.error("Firebase excursion creation failed dramatically: ", error);
+        alert("Sorry, an error has occurred while creating excursions. Please wait to create your excursion.");
       });
 
       
-    
+    // TODO: Make sure the Vacation information does not dissappear when going back to the vacation-details page
     // If the excursion already exists, update it in the database
     } else {
-      this.result = this.excursionService.editExcursion(this.receivedExcursionId, this.receivedAccountId, 
-        this.chosenExcursion.title, this.chosenExcursion.start_date, this.chosenExcursion.description);
+      this.excursionService.editExcursion(this.receivedExcursionId, this.receivedAccountId, 
+        this.chosenExcursion.title, this.chosenExcursion.start_date, this.chosenExcursion.description)
+        .then((data: any) => {
 
-      console.log("The raw result data for editing excursions: ");
-      console.log(this.result); 
-
-      this.result.then((data: any) => {
+        console.log("The raw result data for editing excursions: ");
+        console.log(data);
+        
         if (data != undefined && data != String && data != -1){
           console.log('Congratulations! You\'ve successfully updated your excursion plan!');
           alert('Congratulations! You\'ve successfully updated your excursion plan!');
@@ -361,7 +359,7 @@ export class ExcursionDetails implements OnInit {
           // this.commService.transmitData2(this.receivedVacationId);
 
           sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
-          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_info' : this.receivedVacationId}));
+          sessionStorage.setItem('vacationInfo', JSON.stringify({'vacation_id' : this.receivedVacationId}));
           this.router.navigate(['/vacation-details']);
         
         // Catch errors when they occur.
@@ -377,6 +375,9 @@ export class ExcursionDetails implements OnInit {
 
           return;
         }
+      }).catch((error : any) => {
+        console.error("Firebase excursion editing failed dramatically: ", error);
+        alert("Sorry, an error has occurred while editing excursions. Please wait to change your excursion.");
       });
     }
   }

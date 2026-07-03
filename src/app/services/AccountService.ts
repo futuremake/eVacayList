@@ -294,7 +294,7 @@ constructor(private http: HttpClient) { }
         passcode: editPasscode
       });
 
-      return e;
+      return accountId;
     }
      
     return -1;
@@ -308,7 +308,7 @@ constructor(private http: HttpClient) { }
       const removeRef = doc(db, "accounts", accountId.toString());
       const r = await deleteDoc(removeRef);
 
-      return r;
+      return accountId;
     }
 
     return -1;

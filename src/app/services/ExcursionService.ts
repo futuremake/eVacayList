@@ -198,20 +198,25 @@ export class ExcursionService {
     newTitle: string | undefined, newStartDate: string | undefined, newDescription: string | undefined) {
 
       try {
-        const excursionRef = await addDoc(collection(db, "excursions"), {
-          account_id: newAccountId,
-          vacation_id: newVacationId,
-          title: newTitle,
-          start_date: newStartDate,
-          description: newDescription,
-        });
 
-        await updateDoc(excursionRef, {
-          id: excursionRef.id
-        });
+        if (newAccountId != undefined) {
+          const excursionRef = await addDoc(collection(db, "excursions"), {
+            account_id: newAccountId,
+            vacation_id: newVacationId,
+            title: newTitle,
+            start_date: newStartDate,
+            description: newDescription,
+          });
 
-        return excursionRef.id;
+          await updateDoc(excursionRef, {
+            id: excursionRef.id
+          });
 
+          return excursionRef.id;
+        } else {
+          
+          return -1;
+        }
       } catch (error) {
         if (error instanceof Error) {
           console.log("Error message: " + error.message);

@@ -53,28 +53,35 @@ export class NewAccount {
     } else {
       alert("Make sure you got your new password written right!");
       this.signupForm.reset();
+      return;
     }
     
     this.signupForm.reset();
 
-    const result = this.accountService.createAccount(this.newAccount.username, this.newAccount.email, this.newAccount.password, this.newAccount.passcode);
-    
-    result.then((data) => {
-      console.log("Resulting Data: ");
-      console.log(data);
-      this.resultData = data;
-    });
+    // FIXME: Make sure the new account is accessable as soon as the user goes back to the login screen.
+    // This time, we handle the asynchronous response INSIDE the ".then()" block
+    this.accountService.createAccount(this.newAccount.username, this.newAccount.email, this.newAccount.password, 
+      this.newAccount.passcode)
+      .then((data) => {
+        console.log("Resulting Data: ");
+        console.log(data);
+        this.resultData = data;
 
-    // If the account was successfully made, go back to the log-in screen.
-    if (this.resultData != -1) {
-      console.log('New account made: ', result);
-      alert('New Account made! Let the vacation planning journey begin!');
-      this.router.navigate(['/log-in']);
+        // Now, the account can be accessed immediately after going back to the log-in screen.
+        // If the account was successfully made, go back to the log-in screen.
+        if (this.resultData != -1) {
+          console.log('New account made: ', this.resultData);
+          alert('New Account made! Let the vacation planning journey begin!');
+          this.router.navigate(['/log-in']);
 
-    // If the account was not successfully made, don't do anything.
-    } else {
-      console.log('Account creation failed. Sorry.');
-      alert('Sorry, Account creation failed. Try again later!');
-    }
+        // If the account was not successfully made, don't do anything.
+        } else {
+          console.log('Account creation failed. Sorry.');
+          alert('Sorry, Account creation failed. Try again later!');
+        }
+      }).catch ((error: any) => {
+        console.error("Firebase account creation failed dramatically: ", error);
+        alert("Sorry, an error has occured while creating accounts. You will have to wait to create your account.");
+      });
   }
 }

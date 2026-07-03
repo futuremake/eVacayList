@@ -166,9 +166,10 @@ export class VacationList implements OnInit{
       console.log('Searching for Vacations with this title: ' + this.processedValue);
       this.vacations = [];
 
+      // TODO: Make sure only vacations with the search value are shown
       // Searching for vacations using Firestore
-      const searchVacations = this.vacationService.retrieveVacations(this.receivedAccountId)
-      searchVacations.then((data) => {
+      this.vacationService.retrieveVacations(this.receivedAccountId)
+        .then((data) => {
         console.log("Vacation Data to search through: ");
         console.log(data);
 
@@ -180,9 +181,12 @@ export class VacationList implements OnInit{
             }
           });
         } else {
-          console.log("Sorry, An Error has occurred Please try again later.");
-          alert("Sorry, an Error has occurred. Please try again later.");
+          console.log("Sorry, the vacation hunt failed. Please try hunting again later.");
+          alert("Sorry, the vacation hunt failed. Please try hunting again later.");
         }
+      }).catch((error : any) => {
+        console.error("Firebase Vacation retrieval failed dramatically: ", error);
+        alert("Sorry, an error has occurred while retrieving vacations. You will have to wait to retrieve your vacations.");
       });
     
     // If the account does not exist, don't do anything.

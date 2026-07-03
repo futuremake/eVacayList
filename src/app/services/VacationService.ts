@@ -282,10 +282,10 @@ export class VacationService {
       } catch (error) {
         if (error instanceof Error) {
           console.log("Error Message: " + error.message);
-          return error.message;
+          return -1;
         } else {
           console.log("Unknown error: " + error);
-          return "An Unknown Error has occurred.";
+          return -1;
         }
       }
 
@@ -296,7 +296,7 @@ export class VacationService {
 
     try {    
       const vacayRef = collection(db, "vacations");
-      const q = query(vacayRef, where("id", "==", accountId));
+      const q = query(vacayRef, where("account_id", "==", accountId));
       const querySnapshot = await getDocs(q);
 
       this.foundVacation = new Vacation();
@@ -350,7 +350,7 @@ export class VacationService {
         description: editDescription
       });
 
-      return e;
+      return vacationId;
     }
 
     return -1;

@@ -91,28 +91,35 @@ export class NewPassword implements OnInit {
         console.log('We found your account Id! it is: ' + this.foundAccountId);
         this.isAccountFound = true;
         break;
-      } else {
-        console.log('We can\'t find your account!');
-      }
+      } 
     }
 
     // If the account exists, change the password.
     if (this.isAccountFound) {
       
-      this.result = this.accountService.editAccount(this.foundAccountId, this.currentAccount.username, this.currentAccount.email,
-        this.currentAccount.password, this.currentAccount.passcode);
+      this.accountService.editAccount(this.foundAccountId, this.currentAccount.username, this.currentAccount.email,
+        this.currentAccount.password, this.currentAccount.passcode)
+        .then((data) => {
 
-      // If all goes well, let the user know.
-      if (this.result != undefined && this.result != -1) {  
-        console.log('Your password was successfully changed. Now you can plan your Vacay!');
-        alert('Your password was successfully changed. Now you can plan your Vacay!');
-        this.router.navigate(['/log-in']);
-        
-      // Catch all errors that occur.
-      } else {
-        console.log('Sorry, We\'ve had some problems with changing your password. Please try again later.');
-        alert('Sorry, We\'ve had some problems with changing your password. Please try again later.');
-      }
+          console.log("The Raw Account Data: ");
+          console.log(data);
+
+          // If all goes well, let the user know.
+          if (data != undefined && data != -1) {  
+            console.log('Your password was successfully changed. Now you can plan your Vacay!');
+            alert('Your password was successfully changed. Now you can plan your Vacay!');
+            this.router.navigate(['/log-in']);
+            
+          // Catch all errors that occur.
+          }  else {
+            console.log('Sorry, We\'ve had some problems with changing your password. Please try again later.');
+            alert('Sorry, We\'ve had some problems with changing your password. Please try again later.');
+          }
+
+        }).catch ((error : any) => {
+          console.error("Firebase account editing failed dramatically: ", error);
+          alert("Sorry, there was an error with changing your password. Please wait and then try again.");
+        });      
 
     // If the account does not exist, don't do anything.
     } else {

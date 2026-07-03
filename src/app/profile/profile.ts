@@ -111,22 +111,22 @@ export class Profile implements OnInit {
     // Checking if this account has any vacations in it from Firestore
     this.vacationService.retrieveVacations(this.receivedAccountId).then((data) => {
       if (data instanceof Array) {
-        console.log("Vacations retrieved from this account: " + data.length);
-      }
 
-      if (data instanceof Array){
+        // console.log("Vacations retrieved from this account: " + data.length);
+      
         data.forEach(item => {
           if (item != undefined && item.account_id == this.receivedAccountId) {
             this.hasVacay = true;
           }
         });
+
+        console.log('Does this Account have any vacations? ' + this.hasVacay);
+
       } else {
         console.log("Sorry, An Error has occurred Please try again later.");
         alert("Sorry, an Error has occurred. Please try again later.");
       }
     });
-    console.log('Does this Account have any vacations? ' + this.hasVacay);
-
   }
 
   // Going back to the vacation list page
@@ -155,25 +155,29 @@ export class Profile implements OnInit {
     this.currentAccount.email = this.updateForm.value.userData.email;
     this.currentAccount.username = this.updateForm.value.userData.username;
     
-    this.result = this.accountService.editAccount(this.currentAccount.id, this.currentAccount.username, this.currentAccount.email, 
-      this.currentAccount.password, this.currentAccount.passcode);
-    
-    // Make sure the profile info was really changed
-    if (this.result != undefined && this.result != -1) {
-      alert('You have successfully updated your account!');
-      // this.commService.transmitData(this.receivedAccountId);
+    this.accountService.editAccount(this.currentAccount.id, this.currentAccount.username, this.currentAccount.email, 
+      this.currentAccount.password, this.currentAccount.passcode).then((data) => {
 
-      sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
-      this.router.navigate(['/vacation-list']);
-    
-    // Catch any Errors that occur
-    } else {
-      console.log("Sorry, An Error has occurred Please try again later.");
-      alert("Sorry, an Error has occurred. Please try again later.");
-      this.updateForm.reset();
-    }
-    
-    
+        console.log("The raw account data: ");
+        console.log(data);
+        // Make sure the profile info was really changed
+        if (data != undefined && data != -1) {
+          alert('You have successfully updated your account!');
+          // this.commService.transmitData(this.receivedAccountId);
+
+          sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.receivedAccountId}));
+          this.router.navigate(['/vacation-list']);
+        
+        // Catch any Errors that occur
+        } else {
+          console.log("Sorry, An Error has occurred Please try again later.");
+          alert("Sorry, an Error has occurred. Please try again later.");
+          this.updateForm.reset();
+        }
+      }).catch((error : any) => {
+        console.error("Firebase account editing failed dramatically: ", error);
+        alert("Sorry, there was an issue with editing your account. Please wait if you want to edit your account.");
+      });    
   }
 
   // Deleting an account
@@ -183,27 +187,35 @@ export class Profile implements OnInit {
     if (this.receivedAccountId == undefined || this.receivedAccountId == -1) {
       console.log('You can\'t delete an account that doesn\'t exist!');
       alert('You can\'t delete an account that doesn\'t exist!');
+      return;
     } else {
 
       // If the account has any vacations, don't delete.
       if (this.hasVacay) {
         console.log('You can\'t delete an account that has vacations!');
         alert('You can\'t delete an account that has vacations!');
+        return;
 
       // If the account has no vacations, then delete.
       } else {
-        this.result = undefined;
+        // this.result = undefined;
 
-        this.result = this.accountService.removeAccount(this.currentAccount.id);
-        
-        if (this.result != undefined && this.result != -1) {
-          console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
-          alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!'
-            + ' (Make sure you close your browser to protect your data.)');
-          this.router.navigate(['/home']);
-        } else {
-          console.log('Sorry, an Error has occurred. If you really want to delete your account, wait until later.')
-        }
+        this.accountService.removeAccount(this.currentAccount.id)
+          .then((data) => {
+            if (data != undefined && data != -1) {
+              console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
+              alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!'
+                + ' (Make sure you close your browser to protect your data.)');
+              this.router.navigate(['/home']);
+            } else {
+              console.log('Sorry, an Error has occurred. If you really want to delete your account, wait until later.');
+              alert("Sorry, an Error has occurred. If you really want to delete your account, wait until later.")
+              return;
+            }
+          }).catch((error : any) => {
+            console.log("Firebase account removal failed dramatically: ", error);
+            alert("Sorry, there was an error with removing your account. Please wait then try again to delete your account.");
+          });
       }
     } 
   }

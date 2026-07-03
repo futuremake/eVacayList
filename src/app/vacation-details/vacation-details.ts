@@ -272,61 +272,77 @@ export class VacationDetails implements OnInit {
 
     // If the vacation is new, save it into the database
     if (this.recievedVacationId == undefined || this.recievedVacationId == -1) {
-      this.result = this.vacationService.createVacation(this.recievedAccountId, this.chosenVacation.title, this.chosenVacation.lodging, 
-        this.chosenVacation.start_date, this.chosenVacation.end_date, this.chosenVacation.description);
-      if (this.result != undefined && this.result != Error) {
-        console.log('Congratulations! You have just created a vacation plan!');
-        alert('Congratulations! You have just created a vacation plan!');
-        // this.commService.transmitData(this.recievedAccountId);
+      this.vacationService.createVacation(this.recievedAccountId, this.chosenVacation.title, this.chosenVacation.lodging, 
+        this.chosenVacation.start_date, this.chosenVacation.end_date, this.chosenVacation.description)
+        .then((data) => {
 
-        sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
-        this.router.navigate(['/vacation-list']);
+          console.log("The raw vacation data: ");
+          console.log(data);
 
-      // Catch any errors that may appear.
-      } else {
-        console.log("Sorry, an error has occurred. Please try again later.");
-        alert("Sorry, an error has occurred. Please try again later.");
-        
-        this.chosenVacation.account_id = -1;
-        this.chosenVacation.title = 'vacay1';
-        this.chosenVacation.lodging = 'some hotel';
-        this.chosenVacation.start_date = '2026-05-01';
-        this.chosenVacation.end_date = '2026-05-31';
-        this.chosenVacation.description = 'a short vacation description.';
+          if (data != undefined && data != -1) {
+            console.log('Congratulations! You have just created a vacation plan!');
+            alert('Congratulations! You have just created a vacation plan!');
+            // this.commService.transmitData(this.recievedAccountId);
 
-        return;
-      }
-      
+            sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
+            this.router.navigate(['/vacation-list']);
+
+          // Catch any errors that may appear.
+          } else {
+            console.log("Sorry, an error has occurred. Please try again later.");
+            alert("Sorry, an error has occurred. Please try again later.");
+            
+            this.chosenVacation.account_id = -1;
+            this.chosenVacation.title = 'vacay1';
+            this.chosenVacation.lodging = 'some hotel';
+            this.chosenVacation.start_date = '2026-05-01';
+            this.chosenVacation.end_date = '2026-05-31';
+            this.chosenVacation.description = 'a short vacation description.';
+
+            return;
+          }
+        }).catch((error : any) => {
+          console.error("Firebase vacation creation failed dramatically: ", error);
+          alert("Sorry, an error has occurred while creating your vacation. Please wait, then create your account later.");
+        });
     
     // If the vacation already exists, update it in the database
     } else {
       this.result = undefined;
 
-      this.result = this.vacationService.editVacation(this.recievedVacationId, this.recievedAccountId, this.chosenVacation.title, this.chosenVacation.lodging,
-        this.chosenVacation.start_date, this.chosenVacation.end_date, this.chosenVacation.description);
-     
-      if (this.result != undefined && this.result != -1) {
-        console.log('You have successfully imporved your vacation plan.');
-        alert('You have successfully imporved your vacation plan.');
-        // this.commService.transmitData(this.recievedAccountId);
+      this.vacationService.editVacation(this.recievedVacationId, this.recievedAccountId, this.chosenVacation.title, this.chosenVacation.lodging,
+        this.chosenVacation.start_date, this.chosenVacation.end_date, this.chosenVacation.description)
+        .then((data) => {
 
-        sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
-        this.router.navigate(['/vacation-list']);
-        
-      // Catch any errors that may appear.
-      } else {
-        console.log("Sorry, an error has occurred. Please try again later.");
-        alert("Sorry, an error has occurred. Please try again later.");
-        
-        this.chosenVacation.account_id = -1;
-        this.chosenVacation.title = 'vacay1';
-        this.chosenVacation.lodging = 'some hotel';
-        this.chosenVacation.start_date = '2026-05-01';
-        this.chosenVacation.end_date = '2026-05-31';
-        this.chosenVacation.description = 'a short vacation description.';
+          console.log("The raw vacation data: ");
+          console.log(data);
 
-        return;
-      }
+          if (data != undefined && data != -1) {
+            console.log('You have successfully imporved your vacation plan.');
+            alert('You have successfully imporved your vacation plan.');
+            // this.commService.transmitData(this.recievedAccountId);
+
+            sessionStorage.setItem('acccountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
+            this.router.navigate(['/vacation-list']);
+            
+          // Catch any errors that may appear.
+          } else {
+            console.log("Sorry, an error has occurred. Please try again later.");
+            alert("Sorry, an error has occurred. Please try again later.");
+            
+            this.chosenVacation.account_id = -1;
+            this.chosenVacation.title = 'vacay1';
+            this.chosenVacation.lodging = 'some hotel';
+            this.chosenVacation.start_date = '2026-05-01';
+            this.chosenVacation.end_date = '2026-05-31';
+            this.chosenVacation.description = 'a short vacation description.';
+
+            return;
+          }
+        }).catch((error : any) => {
+          console.error("Firebase vacation editing failed dramatically: ", error);
+          alert("Sorry, there was an error with editing your vacation. Please wait to edit your vacation.");
+        });
     }
   }
 
@@ -342,7 +358,7 @@ export class VacationDetails implements OnInit {
     console.log('Number of this vacation\'s excursions: ' + this.excursions.length);
     
     // If the vacation has excursions, don't delete it.
-    if (this.anyExcurs) {
+    if (this.excursions.length > 0) {
       console.log('We can\'t delete a Vacation with Excursions!');
       alert('We can\'t delete a Vacation with Excursions!');
       return;
@@ -356,10 +372,10 @@ export class VacationDetails implements OnInit {
 
       console.log("The Result Info: ");
       console.log(data);
-      this.resultData = data;
+      data
 
       // This block now waits perfectly for the database to finish before checking the result
-      if (this.resultData != -1) {
+      if (data != -1) {
         console.log('Vacation deleted. Now, you have more storage space to make a new one!');
         alert('Vacation deleted. Now, you have more storage space to make a new one!');
         sessionStorage.setItem('accountInfo', JSON.stringify({'account_id' : this.recievedAccountId}));
@@ -415,13 +431,15 @@ export class VacationDetails implements OnInit {
       console.log('Searching for Excursions with this title: ' + this.processedValue);
       this.excursions = [];
 
+      // TODO: Make sure only excursions with the search value are shown
       // Searching for excursions using Firestore
-      this.excursionService.retrieveExcursions(this.recievedAccountId).then((data) => {
+      this.excursionService.retrieveExcursions(this.recievedAccountId)
+        .then((data) => {
 
         console.log("Excursions to search through: ");
         console.log(data);
 
-        if (data != -1) {
+        if (data instanceof Array) {
           data.forEach(item => {
             if (item != undefined && item.account_id == this.recievedAccountId && item.vacation_id == this.recievedVacationId 
               && item.title != undefined && item.title.includes(this.processedValue)){
@@ -430,9 +448,12 @@ export class VacationDetails implements OnInit {
             }
           });
         } else {
-          console.log("Sorry, an error has occurred. Please try again later.");
-          alert("Sorry, an error has occurred. Please try again later.");
+          console.log("Sorry, the excursion search failed. Please try searching again later.");
+          alert("Sorry, the excursion search failed. Please try searching again later.");
         }
+      }).catch((error : any) => {
+        console.error("Firebase excursion retrieval failed dramatically: ", error);
+        alert("Sorry, there was an error in retrieving excursions. Please wait and try again later.");
       });
       
     // If the vacation does not exist, don't do anything. 
