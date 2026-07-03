@@ -34,7 +34,9 @@ export class VacationList implements OnInit{
 
   // selectedVacation: Vacation = new Vacation();
   
-  searchValue = signal('');
+  // searchValue = signal('');
+
+  searchValue = '';
 
   filtedVacays: Vacation[] = [];
 
@@ -162,8 +164,11 @@ export class VacationList implements OnInit{
     if (this.receivedAccountId != undefined && this.receivedAccountId != -1){
       // Get the value to search vacations for.
       // this.searchValue = this.searchForm.value.userData.searchBox;
-      this.processedValue = this.searchValue.toString().substring(9).replace(']', '');
-      console.log('Searching for Vacations with this title: ' + this.processedValue);
+      // this.processedValue = this.searchValue.toString().substring(9).replace(']', '');
+      console.log(this.searchForm.value.userData.searchBox);
+      this.processedValue = this.searchForm.value.userData.searchBox;
+      console.log('Searching for Vacations with this title: ') 
+      console.log(this.processedValue);
       this.vacations = [];
 
       // TODO: Make sure only vacations with the search value are shown

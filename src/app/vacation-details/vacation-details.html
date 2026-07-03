@@ -203,11 +203,16 @@
     id="user-data"
     ngModelGroup="userData"
     #userData="ngModelGroup">
-        <div>
-            <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Excursion Title</button>
-            <input class="searchBox" id="searchBox" type="text" name="searchBox" #searchBox [(ngModel)]="searchValue" 
-            name="searchValue" placeholder="Type your title here."/><br><br>
-        </div>
+        <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Excursion Title</button>
+        <input 
+        type="text"
+        id="searchBox"
+        class="searchBox" 
+        ngModel
+        name="searchBox"
+        text
+        #searchBox="ngModel"
+        placeholder="Type your title here."/><br><br>
     </div>
 </form>
 

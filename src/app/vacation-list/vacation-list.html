@@ -17,10 +17,23 @@
     
 </form> -->
 
+<!-- TODO: Find a new way to process search values to find specific vacations -->
 <form (submit)="onSubmit()" #f="ngForm">
-    <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Vacation Title</button>
-    <input class="searchBox" type="text" id="searchBox" name="searchBox" #searchBox [(ngModel)]="searchValue" name="searchValue" placeholder="Type your title here."/><br><br>
-    
+    <div 
+    id="user-data"
+    ngModelGroup="userData"
+    #userData="ngModelGroup">
+        <button class="searchButton" id="searchButton" type="submit" name="searchButton">Search Vacation Title</button>
+        <input 
+        type="text" 
+        id="searchBox"
+        class="searchBox" 
+        ngModel 
+        name="searchBox" 
+        text 
+        #searchBox="ngModel" 
+        placeholder="Type your title here."/><br><br>
+    </div>
 </form>
 
 <!-- <ul>

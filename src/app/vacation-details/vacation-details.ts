@@ -427,7 +427,10 @@ export class VacationDetails implements OnInit {
     if (this.recievedVacationId != undefined && this.recievedVacationId != -1) {
       // Get the value to search excursions for.
       // this.searchValue = this.searchForm.value.userData.searchBox;
-      this.processedValue = this.searchValue.toString().substring(9).replace(']', '');
+      // this.processedValue = this.searchValue.toString().substring(9).replace(']', '');
+      
+      console.log(this.searchForm.value.userData.searchBox);
+      this.processedValue = this.searchForm.value.userData.searchBox;
       console.log('Searching for Excursions with this title: ' + this.processedValue);
       this.excursions = [];
 
