@@ -122,6 +122,9 @@ export class VacationList implements OnInit{
   // Go back to the login screen.
   logOutPath(): void {
     alert('Want someone else to make a list? Alright then. (Make sure you close your browser to protect your data.)');
+    sessionStorage.removeItem('accountInfo');
+    sessionStorage.removeItem('vacationInfo');
+    sessionStorage.removeItem('excursionInfo');
     this.router.navigate(['/log-in']);
   }
 

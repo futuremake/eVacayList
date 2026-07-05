@@ -203,9 +203,14 @@ export class Profile implements OnInit {
         this.accountService.removeAccount(this.currentAccount.id)
           .then((data) => {
             if (data != undefined && data != -1) {
-              console.log('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!');
-              alert('Thank you for making an account with us. When you need more vacation planning help, You know where to find us!'
-                + ' (Make sure you close your browser to protect your data.)');
+              console.log('Thank you for making an account with us. When you need more vacation planning help, '
+                +'You know where to find us!');
+              alert('Thank you for making an account with us. When you need more vacation planning help,' 
+                + 'You know where to find us! (Make sure you close your browser to protect your data.)');
+              
+              sessionStorage.removeItem('accountInfo');
+              sessionStorage.removeItem('vacationInfo');
+              sessionStorage.removeItem('excursionInfo');  
               this.router.navigate(['/home']);
             } else {
               console.log('Sorry, an Error has occurred. If you really want to delete your account, wait until later.');
@@ -218,5 +223,14 @@ export class Profile implements OnInit {
           });
       }
     } 
+  }
+
+  // Logging out of the account
+  logOutPath(): void {
+    alert('Want someone else to make a list? Alright then. (Make sure you close your browser to protect your data.)');
+    sessionStorage.removeItem('accountInfo');
+    sessionStorage.removeItem('vacationInfo');
+    sessionStorage.removeItem('excursionInfo');
+    this.router.navigate(['/log-in']);
   }
 }
